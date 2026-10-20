@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pizzería Torre del Oro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            max-width: 100%;
+        }
+ 
+        html, body {
+            overflow-x: hidden;
+            background-color: var(--background_color);
+        }
+ 
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+ 
+        :root {
+            --background_color: #3c3d42;
+            --ancho-referencia: 800px;
+            --ancho-total: min(90vw, var(--ancho-referencia));
+            --alto-banner: 550px;
+            --banner-desde-arriba: 95px;
+            --alto-escena: calc(var(--banner-desde-arriba) + var(--alto-banner));
+            --arco-margen-neg: -140px;
+        }
+ 
+        @media (max-width: 800px) {
+            :root {
+                --alto-banner: calc(600px * (var(--ancho-total) / 800px));
+                --banner-desde-arriba: calc(75px * (var(--ancho-total) / 800px));
+                --arco-margen-neg: calc(-140px * 90vw / 800px);
+            }
+        }
+ 
+        .hero {
+            background-color: var(--background_color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: clip;
+            overflow-y: visible;
+            padding: 0;
+            margin-top: -20px;
+        }
+ 
+        .top-menu {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            background: #0a0a0a;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+ 
+        .logo {
+            color: #f3b33d;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+ 
+        .top-menu nav {
+            display: flex;
+            gap: 30px;
+        }
+ 
+        .top-menu nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+ 
+        .top-menu nav a:hover { opacity: 1; }
+ 
+        /* ── Arco selector ── */
+        .arc-selector-wrap {
+            width: var(--ancho-total);
+            max-width: var(--ancho-referencia);
+            margin: 0 auto -60px;
+            position: relative;
+            z-index: 20;
+            pointer-events: none;
+        }
+ 
+        @media (min-width: 801px) {
+        .arc-selector-wrap {
+        margin: 0 auto -160px;
+        }
+    }
+        .arc-selector-wrap svg {
+            width: 100%;
+            height: auto;
+            overflow: visible;
+            display: block;
+            pointer-events: none;
+        }
+ 
+        .arc-selector-wrap svg .arc-hotspot {
+            pointer-events: all;
+            cursor: pointer;
+        }
+ 
+        /* ── Escena pizza ── */
+        .pizza-scene {
+            position: relative;
+            width: var(--ancho-total);
+            height: var(--alto-escena);
+            margin: var(--desplazamiento-vertical-escena) auto 0;
+            background-color: var(--background_color);
+            overflow: hidden;
+        }
+ 
+        .pizza-clip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(var(--ancho-total) / 2);
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: auto;
+            border-radius: 24px 24px 0 0;
+        }
+ 
+        .pizza-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--ancho-total);
+            height: var(--ancho-total);
+            cursor: pointer;
+            will-change: transform;
+            -webkit-tap-highlight-color: transparent;
+            backface-visibility: hidden;
+        }
+ 
+        .pizza-wrapper img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: contain;
+            object-position: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: none;
+            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.25));
+        }
+ 
+        .pizza-wrapper img.active { opacity: 1; }
+ 
+        .capa-negra-intermedia {
+            position: absolute;
+            top: var(--banner-desde-arriba);
+            left: 0;
+            width: 100%;
+            height: var(--alto-banner);
+            pointer-events: none;
+            z-index: 10;
+        }
+ 
+        .mitad-inferior-negra {
+            position: absolute;
+            bottom: -2%; left: 0;
+            width: 100%; height: 75%;
+            background: linear-gradient(
+                to bottom,
+                rgba(60,61,66,0) 0%,
+                rgba(60,61,66,0.25) 20%,
+                rgba(60,61,66,0.7) 45%,
+                rgba(60,61,66,0.96) 70%,
+                var(--background_color) 100%
+            );
+        }
+ 
+        .mask-container {
+            position: absolute;
+            top: var(--banner-desde-arriba);
+            left: 0; width: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+ 
+        .banner-img {
+            width: 100%;
+            height: var(--alto-banner);
+            background-image: url('banner.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            transform: scale(1.02);
+            position: relative;
+        }
+ 
+        .banner-img::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(
+                to right,
+                var(--background_color) 0%,
+                transparent 12%,
+                transparent 88%,
+                var(--background_color) 100%
+            );
+        }
+ 
+        .exceso-negro {
+            width: 100%;
+            background-color: var(--background_color);
+            height: calc(var(--alto-escena) - var(--banner-desde-arriba) - var(--alto-banner));
+        }
+ 
+        .instrucciones {
+            position: relative;
+            margin-top: -22px;
+            color: #aaa;
+            font-size: clamp(0.75rem, 3.5vw, 0.9rem);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            padding: 6px 20px;
+            border-radius: 50px;
+            pointer-events: none;
+            z-index: 20;
+        }
+ 
+        /* ── Bloque de precios ── */
+        .precio-wrap {
+            width: var(--ancho-total);
+            max-width: var(--ancho-referencia);
+            margin: 28px auto 48px;
+            display: flex;
+            gap: clamp(10px, 3vw, 20px);
+            align-items: stretch;
+        }
+ 
+        .precio-card {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 18px;
+            padding: clamp(16px, 4vw, 26px) clamp(14px, 3vw, 22px);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+ 
+        .precio-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% -10%, rgba(243,179,61,0.08) 0%, transparent 65%);
+            pointer-events: none;
+        }
+ 
+        .precio-card.sin-porcion {
+            opacity: 0.55;
+        }
+ 
+        .precio-label {
+            font-size: clamp(0.62rem, 1.8vw, 0.75rem);
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            font-weight: 600;
+        }
+ 
+        .precio-nombre {
+            font-size: clamp(0.78rem, 2.4vw, 0.95rem);
+            font-weight: 600;
+            color: rgba(255,255,255,0.65);
+            min-height: 1.3em;
+            margin-top: 2px;
+        }
+ 
+        .precio-valor {
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+            margin-top: 6px;
+        }
+ 
+        .precio-num {
+            font-size: clamp(1.7rem, 6.5vw, 2.6rem);
+            font-weight: 800;
+            color: #f3b33d;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+ 
+        .precio-euro {
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            font-weight: 700;
+            color: rgba(243,179,61,0.65);
+            margin-left: 1px;
+        }
+ 
+        .precio-sub {
+            margin-top: 6px;
+            font-size: clamp(0.65rem, 1.9vw, 0.78rem);
+            color: rgba(255,255,255,0.28);
+            line-height: 1.4;
+        }
+ 
+        .sin-porcion .precio-sub {
+            display: none;
+        }
+ 
+        /* Separador vertical */
+        .precio-sep {
+            width: 1px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 1px;
+            align-self: stretch;
+            flex-shrink: 0;
+        }
+ 
+        /* Animación de número al cambiar */
+        @keyframes numEntra {
+            from { opacity: 0; transform: translateY(5px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0)   scale(1);    }
+        }
+ 
+        .precio-num.cambiando {
+            animation: numEntra 0.25s ease forwards;
+        }
+ 
+        @media (max-width: 700px) {
+            .top-menu {
+                height: auto;
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+            .top-menu nav {
+                gap: 18px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+       @media (min-width: 1700px) {
+
+    .hero {
+        position: relative;
+    }
+
+    .precio-wrap {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        max-width: none;
+        pointer-events: none;
+        z-index: 30;
+    }
+
+    .precio-card {
+        width: 220px;
+        position: absolute;
+        top: 340px;
+        pointer-events: auto;
+        backdrop-filter: blur(10px);
+    }
+
+    #card-porcion {
+        left: 40px;
+    }
+
+    #card-entera {
+        right: 40px;
+    }
+
+    .precio-sep {
+        display: none;
+    }
+}
+
+    </style>
+</head>
+<body>
+ 
+    <header class="top-menu">
+        <div class="logo">PIZZERÍA TORRE DEL ORO</div>
+    </header>
+ 
+    <div class="hero">
+ 
+        <div class="arc-selector-wrap">
+            <svg id="arc-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <path id="arc-path" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                <g id="arc-labels"></g>
+                <circle id="arc-dot" fill="#f3b33d" cx="0" cy="0"/>
+            </svg>
+        </div>
+ 
+        <div class="pizza-scene">
+            <div class="pizza-clip" id="pizzaClip">
+                <div class="pizza-wrapper" id="pizzaContainer">
+                    <img src="pizza1.png"  class="active" alt="Margherita">
+                    <img src="pizza2.png"  alt="Salvatore">
+                    <img src="pizza3.png"  alt="Cotto">
+                    <img src="pizza4.png"  alt="Barbacoa">
+                    <img src="pizza5.png"  alt="Pepperoni">
+                    <img src="pizza6.png"  alt="Carbonara">
+                    <img src="pizza7.png"  alt="Tonno">
+                    <img src="pizza8.png"  alt="Calzone">
+                    <img src="pizza9.png"  alt="Vegetal">
+                    <img src="pizza10.png" alt="Torre del Oro">
+                    <img src="pizza11.png" alt="4 Formaggi">
+                    <img src="pizza12.png" alt="Dolce">
+                </div>
+            </div>
+ 
+            <div class="capa-negra-intermedia">
+                <div class="mitad-inferior-negra"></div>
+            </div>
+ 
+            <div class="mask-container">
+                <div class="banner-img"></div>
+                <div class="exceso-negro"></div>
+            </div>
+        </div>
+ 
+        <p class="instrucciones">🍕 Toca la pizza para cambiar de sabor 🍕</p>
+ 
+        <!-- Bloque de precios -->
+        <div class="precio-wrap">
+ 
+            <div class="precio-card" id="card-porcion">
+                <div class="precio-label">Porción grande</div>
+                <div class="precio-nombre" id="nombre-porcion"></div>
+                <div class="precio-valor">
+                    <span class="precio-num" id="num-porcion">4,00</span>
+                    <span class="precio-euro">€</span>
+                </div>
+                <div class="precio-sub">Precio por porción</div>
+            </div>
+ 
+            <div class="precio-sep"></div>
+ 
+            <div class="precio-card" id="card-entera">
+                <div class="precio-label">Pizza 34 cm Ø</div>
+                <div class="precio-nombre" id="nombre-entera">Margherita</div>
+                <div class="precio-valor">
+                    <span class="precio-num" id="num-entera">9,90</span>
+                    <span class="precio-euro">€</span>
+                </div>
+                <div class="precio-sub" id="sub-entera">También disponible por porción</div>
+            </div>
+ 
+        </div>
+    </div>
+ 
+    <script>
+    (function () {
+ 
+        /* ═══════════════════════════════
+           DATOS — orden = orden del arco
+        ═══════════════════════════════ */
+        const PIZZAS = [
+            { nombre: 'Margherita',    precio: 9.90,  porcion: 4    },
+            { nombre: 'Salvatore',     precio: 12.00, porcion: 4    },
+            { nombre: 'Cotto',         precio: 10.50, porcion: 4    },
+            { nombre: 'Barbacoa',      precio: 12.50, porcion: 4    },
+            { nombre: 'Pepperoni',     precio: 10.50, porcion: 4    },
+            { nombre: 'Carbonara',     precio: 12.50, porcion: 4    },
+            { nombre: 'Tonno',         precio: 11.00, porcion: 4    },
+            { nombre: 'Calzone',       precio: 12.00, porcion: null },
+            { nombre: 'Vegetal',       precio: 11.00, porcion: 4    },
+            { nombre: 'Torre del Oro', precio: 12.50, porcion: 4    },
+            { nombre: '4 Formaggi',    precio: 12.00, porcion: 4    },
+            { nombre: 'Dolce',         precio: 6.50,  porcion: null },
+        ];
+ 
+        const pizzaNames = PIZZAS.map(p => p.nombre.toUpperCase());
+ 
+        /* ── DOM ── */
+        const clip      = document.getElementById('pizzaClip');
+        const container = document.getElementById('pizzaContainer');
+        const pizzas    = container.querySelectorAll('img');
+ 
+        const cardPorcion  = document.getElementById('card-porcion');
+        const numPorcion   = document.getElementById('num-porcion');
+        const nombrePorcion= document.getElementById('nombre-porcion');
+        const numEntera    = document.getElementById('num-entera');
+        const nombreEntera = document.getElementById('nombre-entera');
+        const subEntera    = document.getElementById('sub-entera');
+ 
+        /* ── Helpers ── */
+        function fmt(n) {
+            return n.toFixed(2).replace('.', ',');
+        }
+ 
+        function animarNum(el, valor) {
+            el.classList.remove('cambiando');
+            void el.offsetWidth; // reflow para reiniciar animación
+            el.textContent = fmt(valor);
+            el.classList.add('cambiando');
+        }
+ 
+       function actualizarPrecios(idx) {
+    const p = PIZZAS[idx];
+    nombreEntera.textContent = p.nombre;
+    animarNum(numEntera, p.precio);
+    subEntera.textContent = 'Precio por pizza';
+
+    const esSinPorcion = (p.nombre === 'Calzone' || p.nombre === 'Dolce');
+
+    if (esSinPorcion || !p.porcion) {
+        cardPorcion.classList.add('sin-porcion');
+        nombrePorcion.textContent = '';
+        numPorcion.textContent = 'No disponible';
+        // Ocultar el símbolo euro y ajustar estilo visual
+        const euroSpan = cardPorcion.querySelector('.precio-euro');
+        if (euroSpan) euroSpan.style.display = 'none';
+        // Opcional: cambiar tamaño de fuente del mensaje
+        numPorcion.style.fontSize = 'clamp(1rem, 4vw, 1.4rem)';
+    } else {
+        cardPorcion.classList.remove('sin-porcion');
+        nombrePorcion.textContent = p.nombre;
+        animarNum(numPorcion, p.porcion);
+        const euroSpan = cardPorcion.querySelector('.precio-euro');
+        if (euroSpan) euroSpan.style.display = 'inline';
+        numPorcion.style.fontSize = '';
+    }
+}
+ 
+        /* ═══════════════════════════════
+           ARCO
+        ═══════════════════════════════ */
+        function getAngles() {
+
+    const W = document.getElementById('arc-svg').clientWidth || 500;
+
+    // móvil pequeño
+    if (W < 420) {
+        return {
+            start: -Math.PI * 0.66,
+            end:   -Math.PI * 0.34
+        };
+    }
+
+    // móviles grandes
+    if (W < 600) {
+        return {
+            start: -Math.PI * 0.71,
+            end:   -Math.PI * 0.29
+        };
+    }
+
+    // tablets
+    if (W < 850) {
+        return {
+            start: -Math.PI * 0.74,
+            end:   -Math.PI * 0.26
+        };
+    }
+
+
+    // laptops medianos
+    if (W < 1150) {
+        return {
+            start: -Math.PI * 0.76,
+            end:   -Math.PI * 0.24
+        };
+    }
+
+    // desktop
+    return {
+        start: -Math.PI * 0.78,
+        end:   -Math.PI * 0.22
+    };
+}
+        let currentIndex = 0;
+        let dotAngle     = null;
+        let dotAnim      = null;
+ 
+        function getArcParams() {
+        const svgEl = document.getElementById('arc-svg');
+        const W  = svgEl.clientWidth || 500;
+
+        let r;
+
+    if (W < 420) {
+        r = W * 0.78;
+    } else if (W < 600) {
+        r = W * 0.84;
+    } else {
+        r = W * 0.92;
+    }
+
+    const cx = W / 2;
+    const H  = W * 0.48;
+    const cy = H + r * 0.68;
+
+    return { W, H, cx, cy, r };
+}
+ 
+        function angleForIndex(i) {
+            const { start, end } = getAngles();
+            return start + (end - start) * (i / (pizzaNames.length - 1));
+        }
+ 
+        function pointOnArc(angle, params) {
+            return {
+                x: params.cx + params.r * Math.cos(angle),
+                y: params.cy + params.r * Math.sin(angle)
+            };
+        }
+ 
+        function animateDot(targetAngle) {
+            const dot    = document.getElementById('arc-dot');
+            const startA = dotAngle !== null ? dotAngle : targetAngle;
+            const diff   = targetAngle - startA;
+            const dur    = 600;
+            const t0     = performance.now();
+            if (dotAnim) cancelAnimationFrame(dotAnim);
+ 
+            function step(now) {
+                const t    = Math.min((now - t0) / dur, 1);
+                const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                const a    = startA + diff * ease;
+                dotAngle   = a;
+                const pt   = pointOnArc(a, getArcParams());
+                dot.setAttribute('cx', pt.x);
+                dot.setAttribute('cy', pt.y);
+                if (t < 1) dotAnim = requestAnimationFrame(step);
+            }
+            dotAnim = requestAnimationFrame(step);
+        }
+ 
+        function actualizarArco(activeIndex) {
+            const p = getArcParams();
+            const { W, H, r } = p;
+            const { start: ANG_START, end: ANG_END } = getAngles();
+ 
+            const svgEl = document.getElementById('arc-svg');
+            svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+            svgEl.setAttribute('height', H);
+ 
+            const p0 = pointOnArc(ANG_START, p);
+            const p1 = pointOnArc(ANG_END,   p);
+            document.getElementById('arc-path').setAttribute('d',
+                `M ${p0.x.toFixed(1)},${p0.y.toFixed(1)} A ${r},${r} 0 0 1 ${p1.x.toFixed(1)},${p1.y.toFixed(1)}`
+            );
+ 
+            const fs     = Math.max(W * 0.020, 8);
+            const lineH  = fs * 1.35;
+            const dotR   = W * 0.013;
+            const FUERA  = W * 0.060;
+            const DENTRO = W * 0.048;
+ 
+            const labelsG = document.getElementById('arc-labels');
+            labelsG.innerHTML = '';
+ 
+            pizzaNames.forEach((name, i) => {
+                const angle    = angleForIndex(i);
+                const pt       = pointOnArc(angle, p);
+                const isActive = i === activeIndex;
+                const esFuera  = (i % 2 === 0);
+                const dir      = esFuera ? -1 : 1;
+ 
+                const grupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                grupo.setAttribute('class', 'arc-hotspot');
+                grupo.style.cursor = isActive ? 'default' : 'pointer';
+                grupo.addEventListener('click', () => irAPizza(i));
+ 
+                /* Área de toque generosa */
+                const taW = Math.max(W * 0.13, 44);
+                const taH = Math.max(W * 0.16, 52);
+                const touch = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                touch.setAttribute('x',      pt.x - taW / 2);
+                touch.setAttribute('y',      esFuera ? pt.y - taH : pt.y);
+                touch.setAttribute('width',  taW);
+                touch.setAttribute('height', taH);
+                touch.setAttribute('fill',   'transparent');
+                grupo.appendChild(touch);
+ 
+                /* Nodo */
+                const nodeDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                nodeDot.setAttribute('cx',   pt.x);
+                nodeDot.setAttribute('cy',   pt.y);
+                nodeDot.setAttribute('r',    isActive ? dotR * 1.4 : dotR);
+                nodeDot.setAttribute('fill', isActive ? 'rgba(243,179,61,0.75)' : 'rgba(255,255,255,0.22)');
+                grupo.appendChild(nodeDot);
+ 
+                /* Línea guía */
+                const offset = esFuera ? FUERA : DENTRO;
+                const lineY1 = pt.y + dir * dotR * 1.8;
+                const lineY2 = pt.y + dir * (dotR * 1.8 + offset);
+ 
+                const guia = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                guia.setAttribute('x1', pt.x); guia.setAttribute('y1', lineY1);
+                guia.setAttribute('x2', pt.x); guia.setAttribute('y2', lineY2);
+                guia.setAttribute('stroke', isActive ? 'rgba(243,179,61,0.45)' : 'rgba(255,255,255,0.12)');
+                guia.setAttribute('stroke-width', '0.8');
+                guia.setAttribute('stroke-dasharray', '3 2');
+                grupo.appendChild(guia);
+ 
+                /* Texto */
+                const words = name.split(' ');
+                const lx    = pt.x;
+                const baseY = esFuera
+                    ? lineY2 - lineH * (words.length - 1) - fs * 0.2
+                    : lineY2 + fs * 0.9;
+ 
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x',            lx);
+                text.setAttribute('text-anchor',  'middle');
+                text.setAttribute('fill',         isActive ? '#f3b33d' : 'rgba(255,255,255,0.40)');
+                text.setAttribute('font-size',    isActive ? fs * 1.12 : fs);
+                text.setAttribute('font-weight',  isActive ? '700' : '400');
+                text.setAttribute('font-family',  'Segoe UI, system-ui, sans-serif');
+                text.setAttribute('letter-spacing', Math.max(W * 0.0015, 0.3));
+ 
+                words.forEach((word, wi) => {
+                    const ts = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                    ts.setAttribute('x', lx);
+                    ts.setAttribute('y', baseY + wi * lineH);
+                    ts.textContent = word;
+                    text.appendChild(ts);
+                });
+ 
+                grupo.appendChild(text);
+                labelsG.appendChild(grupo);
+            });
+ 
+            document.getElementById('arc-dot').setAttribute('r', W * 0.017);
+            animateDot(angleForIndex(activeIndex));
+        }
+ 
+        /* ═══════════════════════════════
+           NAVEGACIÓN
+        ═══════════════════════════════ */
+        let rotation  = 0;
+        let animating = false;
+        const DURACION = 800;
+        const SWAP_EN  = 0.5;
+ 
+        function irAPizza(targetIndex) {
+            if (animating || targetIndex === currentIndex) return;
+            animating = true;
+ 
+            const total         = pizzas.length;
+            const pasosAdelante = ((targetIndex - currentIndex) + total) % total;
+            const pasosAtras    = total - pasosAdelante;
+ 
+            rotation += pasosAdelante <= pasosAtras
+                ? 360 * pasosAdelante
+                : -360 * pasosAtras;
+ 
+            container.style.transition = `transform ${DURACION}ms cubic-bezier(0.65, 0, 0.35, 1)`;
+            container.style.transform  = `rotate(${rotation}deg)`;
+ 
+            setTimeout(() => {
+                pizzas[currentIndex].classList.remove('active');
+                currentIndex = targetIndex;
+                pizzas[currentIndex].classList.add('active');
+                actualizarArco(currentIndex);
+                actualizarPrecios(currentIndex);
+            }, DURACION * SWAP_EN);
+ 
+            setTimeout(() => {
+                animating = false;
+                container.style.transition = '';
+            }, DURACION + 20);
+        }
+ 
+        function girarPizza() {
+            irAPizza((currentIndex + 1) % pizzas.length);
+        }
+ 
+        function precalentarImagenes() {
+            const orig = currentIndex;
+            container.style.transition = 'none';
+            for (let i = 0; i < pizzas.length; i++) {
+                if (i !== orig) {
+                    pizzas[orig].classList.remove('active');
+                    pizzas[i].classList.add('active');
+                    void container.offsetHeight;
+                    window.getComputedStyle(pizzas[i]).opacity;
+                    setTimeout(() => {
+                        pizzas[i].classList.remove('active');
+                        pizzas[orig].classList.add('active');
+                        void container.offsetHeight;
+                    }, 30);
+                }
+            }
+            setTimeout(() => { container.style.transition = ''; }, 200);
+        }
+ 
+        /* ── Init ── */
+        window.addEventListener('load', () => {
+            setTimeout(precalentarImagenes, 80);
+ 
+            function actualizarAlturaClip() {
+                const cl = document.getElementById('pizzaClip');
+                if (cl) cl.style.height = (cl.clientWidth / 2) + 'px';
+            }
+ 
+            actualizarAlturaClip();
+            actualizarArco(0);
+            actualizarPrecios(0);
+ 
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    dotAngle = null;
+                    actualizarAlturaClip();
+                    actualizarArco(currentIndex);
+                }, 80);
+            });
+        });
+ 
+        clip.addEventListener('click', e => { e.stopPropagation(); girarPizza(); });
+        container.addEventListener('dragstart', e => e.preventDefault());
+ 
+        requestAnimationFrame(() => {
+            container.style.transition = 'none';
+            container.style.transform  = 'rotate(0deg)';
+        });
+ 
+    })();
+    </script>
+</body>
+</html>

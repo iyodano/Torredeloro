@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pizza Sevilla - Corte mitad inferior + gradiente en banner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            max-width: 100%;
+        }
+ 
+        html, body {
+            overflow-x: hidden;
+            background-color: var(--background_color);
+        }
+ 
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+ 
+        :root {
+            --background_color: #3c3d42;
+            --ancho-referencia: 800px;
+            --ancho-total: min(90vw, var(--ancho-referencia));
+            --alto-banner: 550px;
+            --banner-desde-arriba: 95px;
+            --alto-escena: calc(var(--banner-desde-arriba) + var(--alto-banner));
+            --desplazamiento-vertical-escena: clamp(0.5rem, 5vh, 2rem);
+        }
+ 
+        @media (max-width: 800px) {
+            :root {
+                --alto-banner: calc(600px * (var(--ancho-total) / 800px));
+                --banner-desde-arriba: calc(75px * (var(--ancho-total) / 800px));
+            }
+        }
+ 
+        .hero {
+            background-color: var(--background_color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 40px 0 30px;
+        }
+ 
+        .top-menu {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5vw;
+            background: #0a0a0a;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+ 
+        .logo {
+            color: #f3b33d;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+ 
+        .top-menu nav {
+            display: flex;
+            gap: 30px;
+        }
+ 
+        .top-menu nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+ 
+        .top-menu nav a:hover {
+            opacity: 1;
+        }
+ 
+        /* Arco selector */
+        .arc-selector-wrap {
+            width: var(--ancho-total);
+            max-width: var(--ancho-referencia);
+            margin: 0 auto -120px;
+            position: relative;
+            z-index: 20;
+            pointer-events: none;
+        }
+ 
+        .arc-selector-wrap svg {
+            width: 100%;
+            height: auto;
+            overflow: visible;
+            display: block;
+        }
+ 
+        /* Escena principal */
+        .pizza-scene {
+            position: relative;
+            width: var(--ancho-total);
+            height: var(--alto-escena);
+            margin: var(--desplazamiento-vertical-escena) auto 0;
+            background-color: var(--background_color);
+            overflow: hidden;
+        }
+ 
+        .pizza-clip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: calc(var(--ancho-total) / 2);
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: auto;
+            border-radius: 24px 24px 0 0;
+        }
+ 
+        .pizza-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--ancho-total);
+            height: var(--ancho-total);
+            cursor: pointer;
+            will-change: transform;
+            -webkit-tap-highlight-color: transparent;
+            backface-visibility: hidden;
+        }
+ 
+        .pizza-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: none;
+            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.25));
+        }
+ 
+        .pizza-wrapper img.active {
+            opacity: 1;
+        }
+ 
+        .capa-negra-intermedia {
+            position: absolute;
+            top: var(--banner-desde-arriba);
+            left: 0;
+            width: 100%;
+            height: var(--alto-banner);
+            pointer-events: none;
+            z-index: 10;
+        }
+ 
+        .mitad-inferior-negra {
+            position: absolute;
+            bottom: -2%;
+            left: 0;
+            width: 100%;
+            height: 75%;
+            background: linear-gradient(
+                to bottom,
+                rgba(60,61,66,0) 0%,
+                rgba(60,61,66,0.25) 20%,
+                rgba(60,61,66,0.7) 45%,
+                rgba(60,61,66,0.96) 70%,
+                var(--background_color) 100%
+            );
+        }
+ 
+        .mask-container {
+            position: absolute;
+            top: var(--banner-desde-arriba);
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: var(--alto-banner);
+            background-image: url('banner.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            transform: scale(1.02);
+            position: relative;
+        }
+        
+   .banner-img::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+        to right,
+        var(--background_color) 0%,
+        transparent 12%,
+        transparent 88%,
+        var(--background_color) 100%
+    );
+}
+
+        .exceso-negro {
+            width: 100%;
+            background-color: var(--background_color);
+            height: calc(var(--alto-escena) - var(--banner-desde-arriba) - var(--alto-banner));
+        }
+ 
+        .instrucciones {
+            position: relative;
+            margin-top: 30px;
+            color: #aaa;
+            font-size: clamp(0.75rem, 3.5vw, 0.9rem);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            padding: 6px 20px;
+            border-radius: 50px;
+            pointer-events: none;
+        }
+ 
+        @media (max-width: 700px) {
+            .top-menu {
+                height: auto;
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+            .top-menu nav {
+                gap: 18px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+ 
+    <header class="top-menu">
+        <div class="logo">PIZZERÍA TORRE DEL ORO</div>
+        <nav>
+            <a href="#">Inicio</a>
+            <a href="#">Carta</a>
+            <a href="#">Promos</a>
+            <a href="#">Contacto</a>
+        </nav>
+    </header>
+ 
+    <div class="hero">
+ 
+        <!-- Arco selector de pizzas -->
+        <div class="arc-selector-wrap">
+            <svg id="arc-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <path id="arc-path" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+                <g id="arc-labels"></g>
+                <circle id="arc-dot" fill="#f3b33d" cx="0" cy="0"/>
+            </svg>
+        </div>
+ 
+        <div class="pizza-scene">
+            <div class="pizza-clip" id="pizzaClip">
+                <div class="pizza-wrapper" id="pizzaContainer">
+                    <img src="pizza1.png" class="active" data-name="TORRE DEL ORO" alt="Pizza Torre del Oro">
+                    <img src="pizza2.png" data-name="VEGETARIANA" alt="Pizza Vegetariana">
+                    <img src="pizza3.png" data-name="PEPPERONI" alt="Pizza Pepperoni">
+                </div>
+            </div>
+ 
+            <div class="capa-negra-intermedia">
+                <div class="mitad-inferior-negra"></div>
+            </div>
+ 
+            <div class="mask-container">
+                <div class="banner-img"></div>
+                <div class="exceso-negro"></div>
+            </div>
+        </div>
+ 
+        <p class="instrucciones">🍕 Haz clic o toca la pizza para girar y cambiar de sabor 🍕</p>
+    </div>
+ 
+    <script>
+    (function () {
+        const clip       = document.getElementById('pizzaClip');
+        const container  = document.getElementById('pizzaContainer');
+        const pizzas     = container.querySelectorAll('img');
+        const pizzaNames = Array.from(pizzas).map(img => img.dataset.name);
+ 
+        const ANG_START = -Math.PI * 0.78;
+        const ANG_END   = -Math.PI * 0.22;
+ 
+        let currentIndex = 0;
+        let dotAngle     = ANG_START;
+        let dotAnim      = null;
+ 
+        /* ---- Parámetros del arco: todo proporcional al ancho real del SVG ---- */
+        function getArcParams() {
+            const svgEl = document.getElementById('arc-svg');
+            const W  = svgEl.clientWidth || 500;
+            const H  = W * 0.32;
+            const cx = W / 2;
+            const r  = W * 0.88;
+            const cy = H + r * 0.72;
+            return { W, H, cx, cy, r };
+        }
+ 
+        function angleForIndex(i) {
+            return ANG_START + (ANG_END - ANG_START) * (i / (pizzaNames.length - 1));
+        }
+ 
+        function pointOnArc(angle, params) {
+            return {
+                x: params.cx + params.r * Math.cos(angle),
+                y: params.cy + params.r * Math.sin(angle)
+            };
+        }
+ 
+        /* ---- Animación de la bolita ---- */
+        function animateDot(targetAngle) {
+            const dot    = document.getElementById('arc-dot');
+            const startA = dotAngle;
+            const diff   = targetAngle - startA;
+            const dur    = 600;
+            const t0     = performance.now();
+            if (dotAnim) cancelAnimationFrame(dotAnim);
+ 
+            function step(now) {
+                const t    = Math.min((now - t0) / dur, 1);
+                const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                const a    = startA + diff * ease;
+                dotAngle   = a;
+                const pt   = pointOnArc(a, getArcParams());
+                dot.setAttribute('cx', pt.x);
+                dot.setAttribute('cy', pt.y);
+                if (t < 1) dotAnim = requestAnimationFrame(step);
+            }
+            dotAnim = requestAnimationFrame(step);
+        }
+ 
+        /* ---- Renderizado completo del arco (se llama en load y en resize) ---- */
+        function actualizarArco(activeIndex) {
+            const p = getArcParams();
+            const { W, H, r } = p;
+ 
+            /* viewBox y altura del SVG proporcionales al ancho real */
+            const svgEl = document.getElementById('arc-svg');
+            svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+            svgEl.setAttribute('height', H);
+ 
+            /* Path del arco */
+            const p0 = pointOnArc(ANG_START, p);
+            const p1 = pointOnArc(ANG_END,   p);
+            document.getElementById('arc-path').setAttribute('d',
+                `M ${p0.x.toFixed(1)},${p0.y.toFixed(1)} A ${r},${r} 0 0 1 ${p1.x.toFixed(1)},${p1.y.toFixed(1)}`
+            );
+ 
+            /* Tamaños proporcionales al ancho */
+            const fs      = W * 0.024;
+            const lineH   = W * 0.032;
+            const offsetY = W * 0.055;
+            const dotR    = W * 0.014;
+ 
+            /* Labels */
+            const labelsG = document.getElementById('arc-labels');
+            labelsG.innerHTML = '';
+ 
+            pizzaNames.forEach((name, i) => {
+                const angle    = angleForIndex(i);
+                const pt       = pointOnArc(angle, p);
+                const isActive = i === activeIndex;
+ 
+                /* Nodo pequeño fijo en el arco */
+                const nodeDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                nodeDot.setAttribute('cx', pt.x);
+                nodeDot.setAttribute('cy', pt.y);
+                nodeDot.setAttribute('r',  isActive ? dotR * 1.3 : dotR);
+                nodeDot.setAttribute('fill', isActive ? 'rgba(243,179,61,0.7)' : 'rgba(255,255,255,0.25)');
+                labelsG.appendChild(nodeDot);
+ 
+                /* Texto siempre hacia arriba desde el punto del arco */
+                const lx = pt.x;
+                const ly = pt.y - offsetY;
+ 
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', lx);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill',        isActive ? '#f3b33d' : 'rgba(255,255,255,0.42)');
+                text.setAttribute('font-size',   isActive ? fs * 1.15 : fs);
+                text.setAttribute('font-weight', isActive ? '700' : '400');
+                text.setAttribute('font-family', 'Segoe UI, system-ui, sans-serif');
+                text.setAttribute('letter-spacing', W * 0.003);
+ 
+                const words = name.split(' ');
+                words.forEach((word, wi) => {
+                    const ts = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+                    ts.setAttribute('x', lx);
+                    ts.setAttribute('y', ly - (words.length - 1 - wi) * lineH);
+                    ts.textContent = word;
+                    text.appendChild(ts);
+                });
+ 
+                labelsG.appendChild(text);
+            });
+ 
+            /* Bolita animada: tamaño proporcional */
+            document.getElementById('arc-dot').setAttribute('r', W * 0.018);
+            animateDot(angleForIndex(activeIndex));
+        }
+ 
+        /* ---- Lógica de giro de pizza ---- */
+        let rotation  = 0;
+        let animating = false;
+        const DURACION = 800;
+        const SWAP_EN  = 0.5;
+ 
+        function precalentarImagenes() {
+            const originalActive = currentIndex;
+            container.style.transition = 'none';
+            for (let i = 0; i < pizzas.length; i++) {
+                if (i !== originalActive) {
+                    pizzas[originalActive].classList.remove('active');
+                    pizzas[i].classList.add('active');
+                    void container.offsetHeight;
+                    window.getComputedStyle(pizzas[i]).opacity;
+                    setTimeout(() => {
+                        pizzas[i].classList.remove('active');
+                        pizzas[originalActive].classList.add('active');
+                        void container.offsetHeight;
+                    }, 30);
+                }
+            }
+            setTimeout(() => { container.style.transition = ''; }, 200);
+        }
+ 
+        function girarPizza() {
+            if (animating) return;
+            animating = true;
+            rotation += 360;
+            container.style.transition = `transform ${DURACION}ms cubic-bezier(0.65, 0, 0.35, 1)`;
+            container.style.transform  = `rotate(${rotation}deg)`;
+ 
+            setTimeout(() => {
+                pizzas[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % pizzas.length;
+                pizzas[currentIndex].classList.add('active');
+                actualizarArco(currentIndex);
+            }, DURACION * SWAP_EN);
+ 
+            setTimeout(() => {
+                animating = false;
+                container.style.transition = '';
+            }, DURACION + 20);
+        }
+ 
+        /* ---- Init ---- */
+        window.addEventListener('load', () => {
+            setTimeout(precalentarImagenes, 80);
+ 
+            function actualizarAlturaClip() {
+                const clipEl = document.getElementById('pizzaClip');
+                if (clipEl) clipEl.style.height = (clipEl.clientWidth / 2) + 'px';
+            }
+ 
+            actualizarAlturaClip();
+            actualizarArco(0);
+ 
+            window.addEventListener('resize', () => {
+                actualizarAlturaClip();
+                actualizarArco(currentIndex);
+            });
+        });
+ 
+        clip.addEventListener('click', e => { e.stopPropagation(); girarPizza(); });
+        container.addEventListener('dragstart', e => e.preventDefault());
+ 
+        requestAnimationFrame(() => {
+            container.style.transition = 'none';
+            container.style.transform  = 'rotate(0deg)';
+        });
+    })();
+    </script>
+</body>
+</html>

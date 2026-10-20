@@ -1,0 +1,22 @@
+.pizza-container {
+    position: relative;
+    width: 500px;
+    height: 500px;
+    cursor: pointer;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pizza {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    transform: rotate(0deg);
+}
+
+/* La pizza que se ve actualmente */
+.pizza.active {
+    opacity: 1;
+}
