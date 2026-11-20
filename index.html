@@ -258,6 +258,7 @@
         }
 
         .arc-selector-wrap svg {
+            will-change: transform;   /* capa propia: al moverse los nombres no se repinta toda la página */
             width: 100%;
             height: auto;
             overflow: visible;
@@ -291,6 +292,10 @@
         .arc-item.activo .guia { stroke: rgba(243,179,61,0.45); }
 
         #arc-dot { filter: drop-shadow(0 0 6px rgba(243,179,61,0.55)); }
+        #arc-svg.difuminado {
+            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 17%, #000 83%, transparent 100%);
+                    mask-image: linear-gradient(to right, transparent 0, #000 17%, #000 83%, transparent 100%);
+        }
 
         /* ── Escena pizza ── */
         .pizza-scene {
@@ -338,10 +343,22 @@
             opacity: 0;
             pointer-events: none;
             transition: none;
-            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.25));
         }
 
         .pizza-wrapper img.active { opacity: 1; }
+        /* Sombra de la pizza: un círculo fijo (más barato que una sombra por foto) */
+        .pizza-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0.75%;
+            border-radius: 50%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            pointer-events: none;
+        }
+        /* Las que no son redondas (Calzone) llevan su sombra con su forma */
+        .pizza-wrapper.sin-circulo::before { opacity: 0; }
+        .pizza-wrapper img.con-forma { filter: drop-shadow(0 10px 25px rgba(0,0,0,0.25)); }
+
 
         /* Flechas laterales: toca izquierda = anterior, derecha = siguiente */
         .flecha {
@@ -538,13 +555,15 @@
             content: '';
             position: absolute;
             top: 0; bottom: 0;
-            left: -60%;
+            left: 0;
             width: 45%;
+            transform: translateX(-130%);
+            will-change: transform;
             background: linear-gradient(100deg, transparent, rgba(255,255,255,0.13), transparent);
             animation: brillo 3.8s ease-in-out infinite;
             pointer-events: none;
         }
-        @keyframes brillo { 0%, 62% { left: -60%; } 100% { left: 130%; } }
+        @keyframes brillo { 0%, 62% { transform: translateX(-130%); } 100% { transform: translateX(290%); } }
         .btn-ruleta:hover { box-shadow: 0 12px 34px rgba(243,179,61,0.22); }
         .btn-ruleta:active { transform: scale(0.98); }
         .btn-ruleta:disabled { cursor: progress; }
@@ -591,6 +610,16 @@
         .hero.ruleta-activa .ingredientes,
         .hero.ruleta-activa .nota-extra { opacity: 0.25; filter: blur(1.5px); }
         .hero.ruleta-activa .ingredientes { animation: none; }
+        /* En la ruleta el nombre activo cambia sin transición (si no, recoloca el texto en cada fotograma) */
+        .hero.ruleta-activa .arc-item text,
+        .hero.ruleta-activa .arc-item .nodo,
+        .hero.ruleta-activa .arc-item .guia { transition: none; }
+        .hero.ruleta-activa .flecha {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .2s ease, visibility 0s linear .2s;
+        }
 
         .confeti {
             position: fixed;
@@ -1025,13 +1054,22 @@
             flex-shrink: 0;
         }
         .estado.abierto b { color: #4cd47b; }
-        .estado.abierto .punto { background: #4cd47b; box-shadow: 0 0 0 0 rgba(76,212,123,0.6); animation: latido 2s infinite; }
+        .estado.abierto .punto { background: #4cd47b; position: relative; }
+        /* Latido con transform/opacity: lo anima la tarjeta gráfica sin repintar la página */
+        .estado.abierto .punto::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: #4cd47b;
+            animation: latido 2s ease-out infinite;
+        }
         .estado.cerrado b { color: #ff8a7a; }
         .estado.cerrado .punto { background: #ff8a7a; }
         @keyframes latido {
-            0%   { box-shadow: 0 0 0 0 rgba(76,212,123,0.55); }
-            70%  { box-shadow: 0 0 0 9px rgba(76,212,123,0); }
-            100% { box-shadow: 0 0 0 0 rgba(76,212,123,0); }
+            0%   { transform: scale(1);   opacity: 0.55; }
+            70%  { transform: scale(3);   opacity: 0; }
+            100% { transform: scale(3);   opacity: 0; }
         }
 
         .ficha {
@@ -1121,7 +1159,7 @@
             html { scroll-behavior: auto; }
             .carrusel-pista { scroll-behavior: auto; }
             .pizza-scene.pista .flecha { animation: none; }
-            .btn-ruleta::after, .btn-ruleta.girando .dado svg { animation: none; }
+            .btn-ruleta::after, .btn-ruleta.girando .dado svg, .estado.abierto .punto::after { animation: none; }
         }
     </style>
 </head>
@@ -1576,6 +1614,7 @@
             img.decoding = 'async';
             if (i === 0) img.fetchPriority = 'high';
             img.onerror = () => { img.onerror = null; img.src = placeholderSVG(p.nombre); };
+            if (p.id === 'calzone') img.classList.add('con-forma');
             container.appendChild(img);
             return img;
         });
@@ -1730,9 +1769,9 @@
             if (g.modo === 'rueda') {
                 maskRect.setAttribute('x', 0); maskRect.setAttribute('y', -60);
                 maskRect.setAttribute('width', g.W); maskRect.setAttribute('height', H + 120);
-                arcRoot.setAttribute('mask', 'url(#arc-mask)');
+                svg.classList.add('difuminado');
             } else {
-                arcRoot.removeAttribute('mask');
+                svg.classList.remove('difuminado');
             }
 
             /* Etiquetas: cada una va girada siguiendo la curva */
@@ -1753,7 +1792,7 @@
                     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); irAPizza(i); }
                 });
                 labelsG.appendChild(grupo);
-                return { g: grupo, visible: true };
+                return { g: grupo, visible: true, oculto: false, tr: '', op: null };
             });
 
             arcDot.setAttribute('r', (g.dotR * 1.45).toFixed(1));
@@ -1762,37 +1801,43 @@
         }
 
         function marcarActivo(idx) {
+            container.classList.toggle('sin-circulo', !!(pizzas[idx] && pizzas[idx].classList.contains('con-forma')));
             items.forEach((it, i) => {
                 it.g.classList.toggle('activo', i === idx);
                 it.g.setAttribute('aria-current', i === idx ? 'true' : 'false');
             });
         }
 
+        /* Pinta la aureola. Solo toca lo que cambia: los nombres que no se ven
+           no se recolocan (así cada fotograma de la ruleta cuesta mucho menos) */
         function pintarArco(ring, dot) {
+            const rueda = geo.modo === 'rueda';
             items.forEach((it, i) => {
                 const k = kDe(i, ring);
-                const th = k * geo.delta;
-                const pt = enAureola(th, geo.Rn);
-                it.g.setAttribute('transform', `translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)}) rotate(${(th / GRAD).toFixed(2)})`);
-                if (geo.modo === 'rueda') {
-                    const op = clamp((geo.kEdge + 0.4 - Math.abs(k)) / 0.9, 0, 1);
-                    it.g.style.opacity = op.toFixed(3);
-                    const vis = op > 0.3;
-                    if (vis !== it.visible) {
-                        it.visible = vis;
-                        it.g.style.pointerEvents = vis ? '' : 'none';
-                        it.g.setAttribute('tabindex', vis ? '0' : '-1');
-                    }
-                } else if (!it.visible || it.g.style.opacity) {
-                    it.visible = true;
-                    it.g.style.opacity = '';
-                    it.g.style.pointerEvents = '';
-                    it.g.setAttribute('tabindex', '0');
+                const op = rueda ? clamp((geo.kEdge + 0.4 - Math.abs(k)) / 0.9, 0, 1) : 1;
+                const oculto = rueda && op === 0;
+                if (oculto) {
+                    if (!it.oculto) { it.oculto = true; it.g.style.visibility = 'hidden'; it.g.style.opacity = '0'; it.op = '0'; }
+                } else {
+                    if (it.oculto) { it.oculto = false; it.g.style.visibility = ''; }
+                    const th = k * geo.delta;
+                    const pt = enAureola(th, geo.Rn);
+                    const tr = `translate(${pt.x.toFixed(1)} ${pt.y.toFixed(1)}) rotate(${(th / GRAD).toFixed(2)})`;
+                    if (tr !== it.tr) { it.tr = tr; it.g.setAttribute('transform', tr); }
+                    const o = rueda ? op.toFixed(2) : '';
+                    if (o !== it.op) { it.op = o; it.g.style.opacity = o; }
+                }
+                const vis = !rueda || op > 0.3;
+                if (vis !== it.visible) {
+                    it.visible = vis;
+                    it.g.style.pointerEvents = vis ? '' : 'none';
+                    it.g.setAttribute('tabindex', vis ? '0' : '-1');
                 }
             });
             const pd = enAureola(geo.modo === 'fijo' ? (dot - (N - 1) / 2) * geo.delta : 0, geo.Rn);
-            arcDot.setAttribute('cx', pd.x.toFixed(2));
-            arcDot.setAttribute('cy', pd.y.toFixed(2));
+            const cx = pd.x.toFixed(1), cy = pd.y.toFixed(1);
+            if (cx !== arcDot.getAttribute('cx')) arcDot.setAttribute('cx', cx);
+            if (cy !== arcDot.getAttribute('cy')) arcDot.setAttribute('cy', cy);
         }
 
         let arcAnim = null;
@@ -1947,14 +1992,24 @@
             const rotTotal = 360 * Math.max(4, Math.round(pasos / 3));   // vueltas completas: acaba derecha
             const frena = x => 1 - Math.pow(1 - x, 4);      // rápido al principio, frena al final
             let mostrado = idx0;
-            const t0 = performance.now();
             container.style.transition = 'none';
 
+            /* El giro de la foto lo lleva el compositor: va fluido aunque el móvil esté ocupado */
+            const MUESTRAS = 60, kf = [];
+            for (let i = 0; i <= MUESTRAS; i++) {
+                const x = i / MUESTRAS;
+                kf.push({ offset: x, transform: `rotate(${(rot0 + rotTotal * frena(x)).toFixed(3)}deg)` });
+            }
+            let giro = null;
+            try { giro = container.animate(kf, { duration: DUR, easing: 'linear', fill: 'forwards' }); } catch (err) { giro = null; }
+            const t0 = performance.now();
+
             function frame(now) {
-                const x = Math.min((now - t0) / DUR, 1);
+                const tiempo = giro && giro.currentTime != null ? giro.currentTime : now - t0;
+                const x = Math.min(tiempo / DUR, 1);
                 const e = frena(x);
                 const sPos = pasos * e;
-                container.style.transform = `rotate(${rot0 + rotTotal * e}deg)`;
+                if (!giro) container.style.transform = `rotate(${rot0 + rotTotal * e}deg)`;
                 pintarArco(ring0 + sPos, (idx0 + sPos) % N);
                 const idx = (idx0 + Math.round(sPos)) % N;
                 if (idx !== mostrado) {
@@ -1969,6 +2024,8 @@
 
                 /* Aterriza */
                 rotation = rot0 + rotTotal;
+                container.style.transform = `rotate(${rotation}deg)`;
+                if (giro) { try { giro.cancel(); } catch (err) {} }
                 ringPos = ring0 + pasos;
                 dotPos = destino;
                 currentIndex = destino;
@@ -1989,6 +2046,10 @@
         }
 
         btnRuleta.addEventListener('click', ruleta);
+        btnRuleta.addEventListener('pointerdown', () => {
+            if (girandoRuleta) return;
+            pizzas.forEach(im => { if (im.decode) im.decode().catch(() => {}); });
+        }, { passive: true });
         pintarRuleta();
         alCambiarIdioma.push(pintarRuleta);
 
