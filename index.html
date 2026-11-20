@@ -160,12 +160,70 @@
 
         .top-menu nav a:hover { opacity: 1; color: var(--oro); }
 
+        .menu-derecha { display: flex; align-items: center; gap: 30px; }
+
+        /* ── Selector de idioma (banderas) ── */
+        .idiomas {
+            display: flex;
+            gap: 2px;
+            padding: 3px;
+            border-radius: 50px;
+            background: rgba(0,0,0,0.22);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .idioma {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 11px 5px 6px;
+            border: 0;
+            border-radius: 50px;
+            background: transparent;
+            color: rgba(255,255,255,0.55);
+            font-family: var(--marca);
+            font-weight: 500;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: background .25s ease, color .25s ease;
+        }
+        .idioma:hover { color: #fff; }
+        .idioma[aria-pressed="true"] {
+            background: rgba(243,179,61,0.16);
+            color: var(--oro);
+            box-shadow: inset 0 0 0 1px rgba(243,179,61,0.45);
+        }
+        .bandera {
+            display: block;
+            width: 22px;
+            height: 15px;
+            border-radius: 3px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.18);
+            opacity: 0.55;
+            filter: saturate(0.6);
+            transition: opacity .25s ease, filter .25s ease;
+        }
+        .bandera svg { display: block; width: 100%; height: 100%; }
+        .idioma:hover .bandera,
+        .idioma[aria-pressed="true"] .bandera { opacity: 1; filter: none; }
+
         @media (max-width: 700px) {
             .top-menu {
                 justify-content: center;
                 padding: 0 20px;
             }
             .top-menu nav { display: none; }
+            .menu-derecha {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            .idioma { padding: 5px; }
+            .idioma span:not(.bandera) { display: none; }
             .logo { gap: 9px; }
             .logo-icono { height: 34px; width: calc(34px * 907 / 504); }
             .logo-pizzeria { font-size: 9px; letter-spacing: 0.5em; }
@@ -187,6 +245,8 @@
             scroll-margin-top: 80px;
         }
         @media (max-width: 700px) { .hero { padding: 10px 0 14px; } }
+        /* Móviles estrechos: el logo se aparta un poco para dejar sitio a las banderas */
+        @media (max-width: 380px) { .logo { margin-right: 66px; } }
 
         /* ── Arco selector (rueda) ── */
         .arc-selector-wrap {
@@ -503,6 +563,7 @@
             margin-top: 2px;
         }
 
+        html[lang="en"] .precio-euro { order: -1; margin: 0 1px 0 0; }
         .precio-valor {
             display: flex;
             align-items: baseline;
@@ -925,7 +986,7 @@
         .horario .cerrado-dia td:last-child { color: rgba(255,255,255,0.35); }
         .horario .hoy td { color: #fff; font-weight: 700; }
         .horario .hoy td:first-child::after {
-            content: 'hoy';
+            content: attr(data-hoy);
             font-family: var(--marca);
             font-weight: 500;
             font-size: 0.66rem;
@@ -949,7 +1010,7 @@
         }
         footer b { color: var(--oro); font-family: var(--marca); font-weight: 500; letter-spacing: 0.12em; }
         footer a { color: rgba(255,255,255,0.55); text-decoration: none; }
-        @media (max-width: 700px) { footer b { display: block; margin-bottom: 6px; } }
+        @media (max-width: 700px) { footer b { display: block; margin-bottom: 6px; } .pie-sep { display: none; } }
         footer a:hover { color: var(--oro); }
 
         /* ── Botón flotante (móvil) ── */
@@ -998,18 +1059,28 @@
                 <svg class="logo-marca" aria-hidden="true"><use href="#lg-marca"/></svg>
             </span>
         </a>
-        <nav>
-            <a href="#carta">Carta</a>
-            <a href="#opiniones">Opiniones</a>
-            <a href="#contacto">Pedir</a>
-        </nav>
+        <div class="menu-derecha">
+            <nav>
+                <a href="#carta" data-t="menuCarta">Carta</a>
+                <a href="#opiniones" data-t="menuOpiniones">Opiniones</a>
+                <a href="#contacto" data-t="menuPedir">Pedir</a>
+            </nav>
+            <div class="idiomas" role="group" aria-label="Idioma · Language">
+                <button class="idioma" type="button" data-lang="es" aria-pressed="true" lang="es" title="Español">
+                    <span class="bandera"><svg viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#AA151B"/><rect y="0.5" width="3" height="1" fill="#F1BF00"/></svg></span><span>ES</span>
+                </button>
+                <button class="idioma" type="button" data-lang="en" aria-pressed="false" lang="en" title="English">
+                    <span class="bandera"><svg viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><clipPath id="uk-t"><path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z"/></clipPath><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" clip-path="url(#uk-t)" stroke="#C8102E" stroke-width="4"/><path d="M30,0 v30 M0,15 h60" stroke="#fff" stroke-width="10"/><path d="M30,0 v30 M0,15 h60" stroke="#C8102E" stroke-width="6"/></svg></span><span>EN</span>
+                </button>
+            </div>
+        </div>
     </header>
 
     <main>
     <section class="hero" id="carta">
 
         <div class="arc-selector-wrap" id="arcWrap">
-            <svg id="arc-svg" xmlns="http://www.w3.org/2000/svg" aria-label="Elige pizza">
+            <svg id="arc-svg" xmlns="http://www.w3.org/2000/svg" aria-label="Elige pizza" data-t-aria="ariaElige">
                 <defs>
                     <linearGradient id="arc-fade" x1="0" x2="1" y1="0" y2="0">
                         <stop offset="0"    stop-color="#fff" stop-opacity="0"/>
@@ -1030,16 +1101,16 @@
         </div>
 
         <div class="pizza-scene" id="pizzaScene">
-            <div class="pizza-clip" id="pizzaClip" role="button" tabindex="-1" aria-label="Cambiar de pizza">
+            <div class="pizza-clip" id="pizzaClip" role="button" tabindex="-1" aria-label="Cambiar de pizza" data-t-aria="ariaCambiar">
                 <div class="pizza-wrapper" id="pizzaContainer">
                     <!-- Las imágenes se generan desde la lista PIZZAS (abajo, en el script) -->
                 </div>
             </div>
 
-            <button class="flecha flecha-izq" id="btnPrev" aria-label="Pizza anterior">
+            <button class="flecha flecha-izq" id="btnPrev" aria-label="Pizza anterior" data-t-aria="ariaPizzaAnt">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
             </button>
-            <button class="flecha flecha-der" id="btnNext" aria-label="Pizza siguiente">
+            <button class="flecha flecha-der" id="btnNext" aria-label="Pizza siguiente" data-t-aria="ariaPizzaSig">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
             </button>
 
@@ -1054,19 +1125,19 @@
 
         <p class="contador-pizza" id="contador" aria-live="polite"><b>1</b> / 12</p>
 
-        <p class="instrucciones">
+        <p class="instrucciones" data-t-html="instrucciones">
             <b>‹</b> Toca un lado <span class="solo-ancho">de la pizza </span>para cambiar <b>›</b>
         </p>
 
         <div class="precio-wrap">
             <div class="precio-card" id="card-porcion">
-                <div class="precio-label">Porción grande</div>
+                <div class="precio-label" data-t="porcionGrande">Porción grande</div>
                 <div class="precio-nombre" id="nombre-porcion"></div>
                 <div class="precio-valor">
                     <span class="precio-num" id="num-porcion">4,00</span>
                     <span class="precio-euro">€</span>
                 </div>
-                <div class="precio-sub">Precio por porción</div>
+                <div class="precio-sub" data-t="precioPorcion">Precio por porción</div>
             </div>
 
             <div class="precio-sep"></div>
@@ -1078,7 +1149,7 @@
                     <span class="precio-num" id="num-entera">9,90</span>
                     <span class="precio-euro">€</span>
                 </div>
-                <div class="precio-sub" id="sub-entera">Precio por pizza</div>
+                <div class="precio-sub" id="sub-entera" data-t="precioPizza">Precio por pizza</div>
             </div>
         </div>
 
@@ -1089,8 +1160,8 @@
     <!-- ── Reseñas ── -->
     <section class="resenas" id="opiniones">
         <div class="seccion-cabecera">
-            <div class="sobretitulo">Opiniones</div>
-            <h2 class="seccion-titulo">Lo que dicen de nosotros</h2>
+            <div class="sobretitulo" data-t="opiniones">Opiniones</div>
+            <h2 class="seccion-titulo" data-t="loQueDicen">Lo que dicen de nosotros</h2>
             <a class="nota-google" id="notaGoogle" target="_blank" rel="noopener">
                 <span class="nota-num" id="notaNum">4,9</span>
                 <span class="nota-detalle">
@@ -1101,23 +1172,23 @@
         </div>
 
         <div class="carrusel" id="carrusel">
-            <div class="carrusel-pista" id="resPista" tabindex="0" aria-label="Reseñas de clientes"></div>
+            <div class="carrusel-pista" id="resPista" tabindex="0" aria-label="Reseñas de clientes" data-t-aria="ariaResenas"></div>
             <div class="carrusel-control">
-                <button class="carrusel-btn" id="resPrev" aria-label="Reseña anterior">
+                <button class="carrusel-btn" id="resPrev" aria-label="Reseña anterior" data-t-aria="ariaResAnt">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
                 </button>
                 <div class="carrusel-puntos" id="resPuntos"></div>
-                <button class="carrusel-btn" id="resNext" aria-label="Reseña siguiente">
+                <button class="carrusel-btn" id="resNext" aria-label="Reseña siguiente" data-t-aria="ariaResSig">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
                 </button>
             </div>
         </div>
 
         <div class="resenas-cta">
-            <a class="btn btn-borde" id="btnVerTodas" target="_blank" rel="noopener">Ver todas en Google</a>
+            <a class="btn btn-borde" id="btnVerTodas" target="_blank" rel="noopener" data-t="verTodas">Ver todas en Google</a>
             <a class="btn btn-oro" id="btnResena" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
-                Déjanos tu reseña
+                <span data-t="dejaResena">Déjanos tu reseña</span>
             </a>
         </div>
     </section>
@@ -1128,9 +1199,9 @@
             <svg class="logo-completo" viewBox="15 55 1265 1125" role="img" aria-label="Pizzería Torre del Oro · Pizza 34 cm">
                 <use href="#lg-letras-p"/><use href="#lg-pizza-p"/><use href="#lg-marca-p"/><use href="#lg-eslogan-p"/>
             </svg>
-            <div class="sobretitulo">¿Te apetece?</div>
-            <h2 class="seccion-titulo">Recién salida del horno</h2>
-            <p class="seccion-sub">Llámanos o escríbenos y te la preparamos.</p>
+            <div class="sobretitulo" data-t="teApetece">¿Te apetece?</div>
+            <h2 class="seccion-titulo" data-t="recienSalida">Recién salida del horno</h2>
+            <p class="seccion-sub" data-t="llamanos">Llámanos o escríbenos y te la preparamos.</p>
             <p class="estado" id="estado" aria-live="polite"></p>
 
             <div class="contacto-botones">
@@ -1146,15 +1217,15 @@
 
             <div class="ficha">
                 <div class="ficha-bloque">
-                    <div class="ficha-titulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg> Dónde estamos</div>
-                    <p class="ficha-texto"><span id="datoDireccion"></span><small>A un paso de la Torre del Oro</small></p>
+                    <div class="ficha-titulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg> <span data-t="dondeEstamos">Dónde estamos</span></div>
+                    <p class="ficha-texto"><span id="datoDireccion"></span><small data-t="aUnPaso">A un paso de la Torre del Oro</small></p>
                     <div class="ficha-enlaces">
-                        <a class="btn btn-borde btn-mini" id="btnRuta" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg> Cómo llegar</a>
+                        <a class="btn btn-borde btn-mini" id="btnRuta" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg> <span data-t="comoLlegar">Cómo llegar</span></a>
                         <a class="btn btn-borde btn-mini" id="btnInstagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg> Instagram</a>
                     </div>
                 </div>
                 <div class="ficha-bloque">
-                    <div class="ficha-titulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Horario</div>
+                    <div class="ficha-titulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> <span data-t="horario">Horario</span></div>
                     <table class="horario" id="tablaHorario"></table>
                 </div>
             </div>
@@ -1163,12 +1234,12 @@
     </main>
 
     <footer>
-        <b>PIZZERÍA TORRE DEL ORO</b> · <a id="pieDireccion" target="_blank" rel="noopener">C. Almirante Lobo, 2 · Sevilla</a> · © <span id="anio">2026</span>
+        <b>PIZZERÍA TORRE DEL ORO</b><span class="pie-sep"> · </span><a id="pieDireccion" target="_blank" rel="noopener" data-t="pieDireccion">C. Almirante Lobo, 2 · Sevilla</a> · © <span id="anio">2026</span>
     </footer>
 
     <a class="btn btn-oro fab-pedir" id="fabPedir" href="#contacto">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
-        Pedir
+        <span data-t="menuPedir">Pedir</span>
     </a>
 
     <script>
@@ -1182,8 +1253,7 @@
         const CONFIG = {
             telefono:   '613 85 10 59',
             whatsapp:   '34613851059',              // número con prefijo, sin + ni espacios ('' para ocultar el botón)
-            mensajeWhatsapp: '¡Hola! Quería hacer un pedido 🍕',
-            direccion:  'C. Almirante Lobo, 2 · 41001 Sevilla',
+            direccion:  'C. Almirante Lobo, 2 · 41001 Sevilla',   // (el texto en inglés está en TEXTOS)
             instagram:  'pizzeria_torredeloro',
             /* Ficha de Google Maps (identificador de la pizzería en Google) */
             googlePlaceId: 'ChIJXYbqyJJtEg0RcgO9WeKWAvs',
@@ -1240,22 +1310,125 @@
            un botón que lleva a esa pizza.
         ══════════════════════════════════════════════ */
         const RESENAS = [
-            { nombre: 'Nuna C.',     estrellas: 5, fecha: 'enero 2026',   fuente: 'Google',
-              texto: 'El sitio es genial la pizza es deliciosa pídete una entera porque te la comes seguro. la masa súper fina y crujiente, los chicos son encantadores, tiene mesa fuera para poder disfrutar de las vistas a la torre del oro.\nY lo mejor de todos son los precios. Comer tan bien por este dinero en el centro de Sevilla es realmente difícil….' },
-            { nombre: 'Franesca G.', estrellas: 5, fecha: 'octubre 2026', fuente: 'Google', pizza: 'cotto',
-              texto: 'Comer pizza en Sevilla!! Es un SÍ\nMuy rica, la atención 10/10, y de sabor un 10.\n\nMasa delgada, precio buenos y atención buena' },
-            { nombre: 'Sonia D.',    estrellas: 5, fecha: 'octubre 2026', fuente: 'Google', pizza: 'dolce',
-              texto: 'La dolce está deliciosa y la atención de 10.\nEl dependiente es encantador.\nPor eso se merece la mejor puntuación.' },
-            { nombre: 'Rosana P.',   estrellas: 5, fecha: 'octubre 2026', fuente: 'Google',
-              texto: 'Pizzas muy ricas, muy amables, siempre que puedo vengo a comer ya que trabajo en una oficina al lado.' },
+            { nombre: 'Nuna C.',     estrellas: 5, fecha: '2026-01', fuente: 'Google',
+              texto: 'El sitio es genial la pizza es deliciosa pídete una entera porque te la comes seguro. la masa súper fina y crujiente, los chicos son encantadores, tiene mesa fuera para poder disfrutar de las vistas a la torre del oro.\nY lo mejor de todos son los precios. Comer tan bien por este dinero en el centro de Sevilla es realmente difícil….',
+              texto_en: 'The place is great and the pizza is delicious – get a whole one, because you’ll definitely finish it. Super thin, crispy dough, the guys are lovely, and there’s a table outside so you can enjoy the views of the Torre del Oro.\nAnd best of all are the prices. Eating this well for this little money in the centre of Seville is really hard to find….' },
+            { nombre: 'Franesca G.', estrellas: 5, fecha: '2026-10', fuente: 'Google', pizza: 'cotto',
+              texto: 'Comer pizza en Sevilla!! Es un SÍ\nMuy rica, la atención 10/10, y de sabor un 10.\n\nMasa delgada, precio buenos y atención buena',
+              texto_en: 'Eating pizza in Seville!! It’s a YES\nVery tasty, the service 10/10, and the flavour a 10.\n\nThin crust, good prices and good service' },
+            { nombre: 'Sonia D.',    estrellas: 5, fecha: '2026-10', fuente: 'Google', pizza: 'dolce',
+              texto: 'La dolce está deliciosa y la atención de 10.\nEl dependiente es encantador.\nPor eso se merece la mejor puntuación.',
+              texto_en: 'The dolce is delicious and the service is a 10.\nThe guy at the counter is lovely.\nThat’s why it deserves the top rating.' },
+            { nombre: 'Rosana P.',   estrellas: 5, fecha: '2026-10', fuente: 'Google',
+              texto: 'Pizzas muy ricas, muy amables, siempre que puedo vengo a comer ya que trabajo en una oficina al lado.',
+              texto_en: 'Really tasty pizzas and very friendly staff. I come for lunch whenever I can, as I work in an office next door.' },
         ];
+
+        /* ══════════════════════════════════════════════
+           IDIOMAS — español / inglés
+           Para cambiar un texto, búscalo aquí por su clave.
+        ══════════════════════════════════════════════ */
+        const TEXTOS = {
+            es: {
+                menuCarta: 'Carta', menuOpiniones: 'Opiniones', menuPedir: 'Pedir',
+                ariaElige: 'Elige pizza', ariaCambiar: 'Cambiar de pizza',
+                ariaPizzaAnt: 'Pizza anterior', ariaPizzaSig: 'Pizza siguiente',
+                instrucciones: '<b>‹</b> Toca un lado <span class="solo-ancho">de la pizza </span>para cambiar <b>›</b>',
+                porcionGrande: 'Porción grande', precioPorcion: 'Precio por porción', precioPizza: 'Precio por pizza',
+                noDisponible: 'No disponible',
+                ingredienteExtra: 'Ingrediente extra',
+                opiniones: 'Opiniones', loQueDicen: 'Lo que dicen de nosotros',
+                ariaResenas: 'Reseñas de clientes', ariaResAnt: 'Reseña anterior', ariaResSig: 'Reseña siguiente',
+                verResena: n => `Ver reseña ${n}`,
+                estrellasDe: n => `${n} de 5 estrellas`,
+                opinionesEnGoogle: n => `${n} opiniones en Google`,
+                ariaNota: (nota, n) => `${nota} de 5 en Google, ${n} opiniones. Ver en Google Maps`,
+                traducida: '',
+                verTodas: 'Ver todas en Google', dejaResena: 'Déjanos tu reseña',
+                teApetece: '¿Te apetece?', recienSalida: 'Recién salida del horno',
+                llamanos: 'Llámanos o escríbenos y te la preparamos.',
+                llamar: tel => `Llamar · ${tel}`,
+                mensajeWhatsapp: '¡Hola! Quería hacer un pedido 🍕',
+                dondeEstamos: 'Dónde estamos', aUnPaso: 'A un paso de la Torre del Oro',
+                direccion: 'C. Almirante Lobo, 2 · 41001 Sevilla', pieDireccion: 'C. Almirante Lobo, 2 · Sevilla',
+                comoLlegar: 'Cómo llegar', horario: 'Horario', hoy: 'hoy', cerrado: 'Cerrado',
+                dias: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                meses: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+                abiertoAhora: 'Abierto ahora', hastaMedianoche: 'hasta medianoche', hastaLas: h => `hasta las ${h}`,
+                abreHoy: h => `abre hoy a las ${h}`, abreManana: h => `abre mañana a las ${h}`,
+                abreDia: (dia, h) => `abre el ${dia.toLowerCase()} a las ${h}`,
+                fotoPronto: 'FOTO MUY PRONTO',
+            },
+            en: {
+                menuCarta: 'Menu', menuOpiniones: 'Reviews', menuPedir: 'Order',
+                ariaElige: 'Choose a pizza', ariaCambiar: 'Change pizza',
+                ariaPizzaAnt: 'Previous pizza', ariaPizzaSig: 'Next pizza',
+                instrucciones: '<b>‹</b> Tap a side <span class="solo-ancho">of the pizza </span>to switch <b>›</b>',
+                porcionGrande: 'Large slice', precioPorcion: 'Price per slice', precioPizza: 'Price per pizza',
+                noDisponible: 'Not available',
+                ingredienteExtra: 'Extra topping',
+                opiniones: 'Reviews', loQueDicen: 'What our customers say',
+                ariaResenas: 'Customer reviews', ariaResAnt: 'Previous review', ariaResSig: 'Next review',
+                verResena: n => `Show review ${n}`,
+                estrellasDe: n => `${n} out of 5 stars`,
+                opinionesEnGoogle: n => `${n} reviews on Google`,
+                ariaNota: (nota, n) => `Rated ${nota} out of 5 on Google from ${n} reviews. See on Google Maps`,
+                traducida: 'Translated from Spanish',
+                verTodas: 'See all on Google', dejaResena: 'Leave us a review',
+                teApetece: 'Hungry?', recienSalida: 'Fresh out of the oven',
+                llamanos: 'Call or message us and we’ll have it ready for you.',
+                llamar: tel => `Call · +34 ${tel}`,
+                mensajeWhatsapp: 'Hi! I’d like to place an order 🍕',
+                dondeEstamos: 'Find us', aUnPaso: 'Just steps from the Torre del Oro',
+                direccion: 'C. Almirante Lobo, 2 · 41001 Seville', pieDireccion: 'C. Almirante Lobo, 2 · Seville',
+                comoLlegar: 'Directions', horario: 'Opening hours', hoy: 'today', cerrado: 'Closed',
+                dias: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+                meses: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                abiertoAhora: 'Open now', hastaMedianoche: 'until midnight', hastaLas: h => `until ${h}`,
+                abreHoy: h => `opens today at ${h}`, abreManana: h => `opens tomorrow at ${h}`,
+                abreDia: (dia, h) => `opens ${dia} at ${h}`,
+                fotoPronto: 'PHOTO COMING SOON',
+            },
+        };
+
+        /* Ingredientes en inglés (los nombres de las pizzas no se traducen) */
+        const INGREDIENTES_EN = {
+            'Tomate': 'Tomato', 'Mozzarella': 'Mozzarella', 'Orégano': 'Oregano',
+            'Anchoas': 'Anchovies', 'Alcaparras': 'Capers', 'Jamón cocido': 'Cooked ham',
+            'Salsa BBQ casera': 'Homemade BBQ sauce', 'Bacon': 'Bacon', 'Ternera': 'Beef',
+            'Salchicha picante': 'Spicy sausage', 'Nata': 'Cream', 'Champiñón': 'Mushrooms',
+            'Cebolla morada': 'Red onion', 'Parmesano': 'Parmesan', 'Pimienta negra': 'Black pepper',
+            'Atún': 'Tuna', 'Aceituna negra': 'Black olives', 'Jamón': 'Ham', 'Pimiento': 'Peppers',
+            'Rúcula': 'Rocket', 'Tomate cherry': 'Cherry tomatoes', 'Jamón serrano': 'Serrano ham',
+            'Aceite picante': 'Chilli oil', 'Queso de cabra': 'Goat’s cheese', 'Gorgonzola': 'Gorgonzola',
+            'Nutella': 'Nutella', 'Oreo': 'Oreo',
+        };
+
+        /* Idioma al entrar: ?lang=en en la dirección → el que eligió la última vez → el del navegador */
+        function detectarIdioma() {
+            try {
+                const q = new URLSearchParams(location.search).get('lang');
+                if (q === 'es' || q === 'en') return q;
+            } catch (e) {}
+            try {
+                const g = localStorage.getItem('tdo-idioma');
+                if (g === 'es' || g === 'en') return g;
+            } catch (e) {}
+            if (/bot|crawl|spider|slurp/i.test(navigator.userAgent)) return 'es';
+            const l = (navigator.languages && navigator.languages[0]) || navigator.language || 'es';
+            return /^(es|ca|gl|eu)\b/i.test(l) ? 'es' : 'en';
+        }
+        let idioma = detectarIdioma();
+        const t = k => (TEXTOS[idioma][k] !== undefined ? TEXTOS[idioma][k] : TEXTOS.es[k]);
+        const tIng = x => (idioma === 'en' && INGREDIENTES_EN[x]) || x;
+        const alCambiarIdioma = [];   // funciones que repintan textos dinámicos
 
         /* ── Utilidades ── */
         const $ = id => document.getElementById(id);
         const NS = 'http://www.w3.org/2000/svg';
         const N = PIZZAS.length;
         const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-        const fmt = n => n.toFixed(2).replace('.', ',');
+        const fmt = n => { const x = n.toFixed(2); return idioma === 'en' ? x : x.replace('.', ','); };
         const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         function svgEl(tag, attrs) {
@@ -1282,7 +1455,7 @@
                     <text x="500" y="320" text-anchor="middle" font-family="Segoe UI, system-ui, Roboto, sans-serif"
                           font-size="${nombre.length > 10 ? 64 : 76}" font-weight="800" letter-spacing="4" fill="#f3b33d">${esc(nombre.toUpperCase())}</text>
                     <text x="500" y="372" text-anchor="middle" font-family="Segoe UI, system-ui, Roboto, sans-serif"
-                          font-size="30" letter-spacing="8" fill="#ffffff" fill-opacity=".55">FOTO MUY PRONTO</text>
+                          font-size="30" letter-spacing="8" fill="#ffffff" fill-opacity=".55">${t('fotoPronto')}</text>
                 </svg>`;
             return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
@@ -1323,7 +1496,7 @@
             ingEl.style.minHeight = '';
             let max = 0;
             PIZZAS.forEach(p => {
-                ingEl.innerHTML = p.ingredientes.map(t => `<span class="ing">${esc(t)}</span>`).join('');
+                ingEl.innerHTML = p.ingredientes.map(x => `<span class="ing">${esc(tIng(x))}</span>`).join('');
                 max = Math.max(max, ingEl.getBoundingClientRect().height);
             });
             ingEl.innerHTML = actual;
@@ -1340,7 +1513,7 @@
             if (!p.porcion) {
                 cardPorcion.classList.add('sin-porcion');
                 nombrePorcion.textContent = '';
-                numPorcion.textContent = 'No disponible';
+                numPorcion.textContent = t('noDisponible');
             } else {
                 cardPorcion.classList.remove('sin-porcion');
                 nombrePorcion.textContent = p.nombre;
@@ -1348,7 +1521,7 @@
             }
             reanimar(numPorcion, 'cambiando');
 
-            ingEl.innerHTML = p.ingredientes.map(t => `<span class="ing">${esc(t)}</span>`).join('');
+            ingEl.innerHTML = p.ingredientes.map(x => `<span class="ing">${esc(tIng(x))}</span>`).join('');
             reanimar(ingEl, 'cambiando');
             contador.innerHTML = `<b>${idx + 1}</b> / ${N}`;
         }
@@ -1653,6 +1826,7 @@
             construirArco();
             actualizarInfo(currentIndex);
             fijarAlturaIngredientes();
+            alCambiarIdioma.push(() => { actualizarInfo(currentIndex); fijarAlturaIngredientes(); });
 
             if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { construirArco(); fijarAlturaIngredientes(); });
 
@@ -1694,45 +1868,58 @@
             const puntos = $('resPuntos');
             if (!RESENAS.length) { $('opiniones').style.display = 'none'; return; }
 
-            pista.innerHTML = RESENAS.map(r => {
-                const n = clamp(Math.round(r.estrellas || 5), 0, 5);
-                const est = '★'.repeat(n) + `<span class="vacia">${'★'.repeat(5 - n)}</span>`;
-                const meta = [r.fuente, r.fecha].filter(Boolean).map(esc).join(' · ');
-                const pz = r.pizza && PIZZAS.find(p => p.id === r.pizza);
-                return `
-                <article class="resena">
+            pista.innerHTML = RESENAS.map(() => '<article class="resena"></article>').join('');
+            const cards = [...pista.children];
+            puntos.innerHTML = cards.map(() => '<button></button>').join('');
+            const dots = [...puntos.children];
+
+            function fechaTexto(f) {
+                const m = /^(\d{4})-(\d{2})$/.exec(f || '');
+                return m ? `${t('meses')[Number(m[2]) - 1]} ${m[1]}` : (f || '');
+            }
+
+            function rellenar() {
+                RESENAS.forEach((r, i) => {
+                    const n = clamp(Math.round(r.estrellas || 5), 0, 5);
+                    const est = '★'.repeat(n) + `<span class="vacia">${'★'.repeat(5 - n)}</span>`;
+                    const traducida = idioma === 'en' && r.texto_en;
+                    const meta = [r.fuente, fechaTexto(r.fecha), traducida ? t('traducida') : ''].filter(Boolean).map(esc).join(' · ');
+                    const pz = r.pizza && PIZZAS.find(p => p.id === r.pizza);
+                    cards[i].innerHTML = `
                     <div class="resena-top">
-                        <span class="estrellas" aria-label="${n} de 5 estrellas">${est}</span>
+                        <span class="estrellas" aria-label="${esc(t('estrellasDe')(n))}">${est}</span>
                         ${pz ? `<a class="resena-pizza" href="#${esc(pz.id)}" data-pizza="${esc(pz.id)}">${esc(pz.nombre)} ›</a>` : ''}
                     </div>
-                    <p class="resena-texto">${esc(r.texto)}</p>
+                    <p class="resena-texto"${traducida ? ' lang="en"' : ' lang="es"'}>${esc(traducida ? r.texto_en : r.texto)}</p>
                     <div class="resena-autor">
                         <span class="avatar">${esc((r.nombre || '?').trim().charAt(0).toUpperCase())}</span>
                         <div><strong>${esc(r.nombre)}</strong><small>${meta}</small></div>
-                    </div>
-                </article>`;
-            }).join('');
+                    </div>`;
+                });
+                dots.forEach((d, i) => d.setAttribute('aria-label', t('verResena')(i + 1)));
+
+                /* Nota media de Google */
+                if (CONFIG.notaGoogle) {
+                    const nota = idioma === 'en' ? CONFIG.notaGoogle.toFixed(1) : CONFIG.notaGoogle.toFixed(1).replace('.', ',');
+                    $('notaNum').textContent = nota;
+                    $('notaRelleno').style.width = (CONFIG.notaGoogle / 5 * 100) + '%';
+                    $('notaTxt').textContent = CONFIG.opinionesGoogle ? t('opinionesEnGoogle')(CONFIG.opinionesGoogle) : 'Google';
+                    $('notaGoogle').setAttribute('aria-label', t('ariaNota')(nota, CONFIG.opinionesGoogle));
+                } else {
+                    $('notaGoogle').style.display = 'none';
+                }
+            }
+            rellenar();
+            alCambiarIdioma.push(rellenar);
 
             /* Botón de pizza en la reseña: sube a la carta y gira hasta esa pizza */
-            pista.querySelectorAll('.resena-pizza').forEach(a => a.addEventListener('click', e => {
+            pista.addEventListener('click', e => {
+                const a = e.target.closest && e.target.closest('.resena-pizza');
+                if (!a) return;
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
                 setTimeout(() => { location.hash = a.dataset.pizza; }, reduceMotion ? 0 : 450);
-            }));
-
-            /* Nota media de Google */
-            if (CONFIG.notaGoogle) {
-                $('notaNum').textContent = CONFIG.notaGoogle.toFixed(1).replace('.', ',');
-                $('notaRelleno').style.width = (CONFIG.notaGoogle / 5 * 100) + '%';
-                $('notaTxt').textContent = CONFIG.opinionesGoogle ? `${CONFIG.opinionesGoogle} opiniones en Google` : 'en Google';
-                $('notaGoogle').setAttribute('aria-label', `${CONFIG.notaGoogle} de 5 en Google, ${CONFIG.opinionesGoogle} opiniones. Ver en Google Maps`);
-            } else {
-                $('notaGoogle').style.display = 'none';
-            }
-
-            const cards = [...pista.children];
-            puntos.innerHTML = cards.map((_, i) => `<button aria-label="Ver reseña ${i + 1}"></button>`).join('');
-            const dots = [...puntos.children];
+            });
             let actual = -1;
 
             function marcar(i) {
@@ -1808,16 +1995,16 @@
             const llamar = $('btnLlamar'), wa = $('btnWhatsapp'), fab = $('fabPedir');
             let tel = CONFIG.telefono.replace(/[^\d+]/g, '');
             if (tel && !tel.startsWith('+')) tel = '+34' + tel;
-            if (tel) {
-                llamar.href = 'tel:' + tel;
-                $('txtLlamar').textContent = 'Llamar · ' + CONFIG.telefono;
-            } else {
-                llamar.style.display = 'none';
-            }
-            if (CONFIG.whatsapp) {
-                wa.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(CONFIG.mensajeWhatsapp)}`;
-            } else {
-                wa.style.display = 'none';
+            if (tel) llamar.href = 'tel:' + tel; else llamar.style.display = 'none';
+            if (!CONFIG.whatsapp) wa.style.display = 'none';
+            function textosContacto() {
+                if (tel) $('txtLlamar').textContent = t('llamar')(CONFIG.telefono);
+                if (CONFIG.whatsapp) wa.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(t('mensajeWhatsapp'))}`;
+                $('datoDireccion').textContent = t('direccion');
+                if (CONFIG.precioExtra) {
+                    const precio = idioma === 'en' ? `+€${fmt(CONFIG.precioExtra)}` : `+${fmt(CONFIG.precioExtra)} €`;
+                    $('notaExtra').innerHTML = `${esc(t('ingredienteExtra'))} <b>${precio}</b>`;
+                }
             }
             /* Enlaces de Google Maps */
             const pid = CONFIG.googlePlaceId;
@@ -1832,13 +2019,11 @@
             $('btnRuta').href = urlRuta;
             $('pieDireccion').href = urlRuta;
 
-            $('datoDireccion').textContent = CONFIG.direccion;
             const ig = $('btnInstagram');
             if (CONFIG.instagram) ig.href = `https://www.instagram.com/${CONFIG.instagram}/`; else ig.style.display = 'none';
 
             /* Horario + "Abierto ahora" (siempre con la hora de Sevilla) */
-            const DIAS = [['domingo', 'Domingo'], ['lunes', 'Lunes'], ['martes', 'Martes'], ['miercoles', 'Miércoles'],
-                          ['jueves', 'Jueves'], ['viernes', 'Viernes'], ['sabado', 'Sábado']];
+            const DIAS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
             const aMin = h => { const [a, b] = h.split(':').map(Number); return a * 60 + b; };
             const hora = h => h === '24:00' ? '00:00' : h;
             function ahoraSevilla() {
@@ -1855,37 +2040,38 @@
             function pintarHorario() {
                 const { dia, min } = ahoraSevilla();
                 const orden = [1, 2, 3, 4, 5, 6, 0];   // de lunes a domingo
+                const nombres = t('dias');
                 $('tablaHorario').innerHTML = orden.map(d => {
-                    const h = HORARIO[DIAS[d][0]];
+                    const h = HORARIO[DIAS[d]];
                     const cls = [d === dia ? 'hoy' : '', h ? '' : 'cerrado-dia'].join(' ').trim();
-                    return `<tr class="${cls}"><td>${DIAS[d][1]}</td><td>${h ? `${hora(h[0])} – ${hora(h[1])}` : 'Cerrado'}</td></tr>`;
+                    const marca = d === dia ? ` data-hoy="${esc(t('hoy'))}"` : '';
+                    return `<tr class="${cls}"><td${marca}>${nombres[d]}</td><td>${h ? `${hora(h[0])} – ${hora(h[1])}` : t('cerrado')}</td></tr>`;
                 }).join('');
 
                 const est = $('estado');
-                const hoy = HORARIO[DIAS[dia][0]];
+                const hoy = HORARIO[DIAS[dia]];
                 if (hoy && min >= aMin(hoy[0]) && min < aMin(hoy[1])) {
                     est.className = 'estado abierto';
-                    const fin = hoy[1] === '24:00' ? 'hasta medianoche' : `hasta las ${hoy[1]}`;
-                    est.innerHTML = `<span class="punto"></span><span><b>Abierto ahora</b> · ${fin}</span>`;
+                    const fin = hoy[1] === '24:00' ? t('hastaMedianoche') : t('hastaLas')(hoy[1]);
+                    est.innerHTML = `<span class="punto"></span><span><b>${t('abiertoAhora')}</b> · ${fin}</span>`;
                 } else {
                     let txt = '';
-                    if (hoy && min < aMin(hoy[0])) txt = `abre hoy a las ${hoy[0]}`;
+                    if (hoy && min < aMin(hoy[0])) txt = t('abreHoy')(hoy[0]);
                     else for (let k = 1; k <= 7; k++) {
-                        const d = (dia + k) % 7, h = HORARIO[DIAS[d][0]];
-                        if (h) { txt = `abre ${k === 1 ? 'mañana' : 'el ' + DIAS[d][1].toLowerCase()} a las ${h[0]}`; break; }
+                        const d = (dia + k) % 7, h = HORARIO[DIAS[d]];
+                        if (h) { txt = k === 1 ? t('abreManana')(h[0]) : t('abreDia')(nombres[d], h[0]); break; }
                     }
                     est.className = 'estado cerrado';
-                    est.innerHTML = `<span class="punto"></span><span><b>Cerrado</b>${txt ? ' · ' + txt : ''}</span>`;
+                    est.innerHTML = `<span class="punto"></span><span><b>${t('cerrado')}</b>${txt ? ' · ' + txt : ''}</span>`;
                 }
             }
             pintarHorario();
+            textosContacto();
             setInterval(pintarHorario, 60000);
+            alCambiarIdioma.push(pintarHorario, textosContacto);
 
             $('anio').textContent = new Date().getFullYear();
 
-            if (CONFIG.precioExtra) {
-                $('notaExtra').innerHTML = `Ingrediente extra <b>+${fmt(CONFIG.precioExtra)} €</b>`;
-            }
 
             /* Botón flotante "Pedir": aparece al bajar, se esconde al llegar a contacto */
             if (tel) fab.href = 'tel:' + tel;
@@ -1897,6 +2083,29 @@
             }
             window.addEventListener('scroll', refrescar, { passive: true });
             refrescar();
+        })();
+
+        /* ══════════════════════════════════════════════
+           SELECTOR DE IDIOMA
+        ══════════════════════════════════════════════ */
+        (function selectorIdioma() {
+            const botones = [...document.querySelectorAll('.idioma')];
+
+            function aplicar(nuevo, guardar) {
+                idioma = nuevo;
+                document.documentElement.lang = idioma;
+                botones.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === idioma)));
+                document.querySelectorAll('[data-t]').forEach(el => { el.textContent = t(el.dataset.t); });
+                document.querySelectorAll('[data-t-html]').forEach(el => { el.innerHTML = t(el.dataset.tHtml); });
+                document.querySelectorAll('[data-t-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.tAria)); });
+                alCambiarIdioma.forEach(fn => fn());
+                if (guardar) { try { localStorage.setItem('tdo-idioma', idioma); } catch (e) {} }
+            }
+
+            botones.forEach(b => b.addEventListener('click', () => {
+                if (b.dataset.lang !== idioma) aplicar(b.dataset.lang, true);
+            }));
+            aplicar(idioma, false);
         })();
 
     })();
