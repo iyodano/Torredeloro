@@ -511,6 +511,95 @@
         .nota-extra b { color: var(--oro); font-weight: 600; }
         .nota-extra:empty { display: none; }
 
+        /* ── Ruleta: pizza sorpresa ── */
+        .ruleta-wrap { width: min(90vw, 460px); margin: 16px auto 0; }
+        .btn-ruleta {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 9px 16px 9px 9px;
+            border-radius: 18px;
+            border: 1.5px solid transparent;
+            background:
+                linear-gradient(#323337, #2b2c30) padding-box,
+                linear-gradient(115deg, #f3b33d, #ffe09a 35%, #c9781a 65%, #f3b33d) border-box;
+            color: #fff;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 10px 28px rgba(243,179,61,0.12);
+            -webkit-tap-highlight-color: transparent;
+            transition: transform .15s ease, box-shadow .3s ease;
+        }
+        .btn-ruleta::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            left: -60%;
+            width: 45%;
+            background: linear-gradient(100deg, transparent, rgba(255,255,255,0.13), transparent);
+            animation: brillo 3.8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes brillo { 0%, 62% { left: -60%; } 100% { left: 130%; } }
+        .btn-ruleta:hover { box-shadow: 0 12px 34px rgba(243,179,61,0.22); }
+        .btn-ruleta:active { transform: scale(0.98); }
+        .btn-ruleta:disabled { cursor: progress; }
+        .btn-ruleta.girando::after { animation-duration: .9s; }
+        .btn-ruleta.premio {
+            box-shadow: 0 0 0 3px rgba(243,179,61,0.35), 0 12px 40px rgba(243,179,61,0.35);
+        }
+        .dado {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #ffd27a, #f3b33d 55%, #d9861e);
+            color: #1b1b1b;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            box-shadow: inset 0 -2px 0 rgba(0,0,0,0.18);
+        }
+        .dado svg { width: 25px; height: 25px; }
+        .btn-ruleta.girando .dado svg { animation: rodar .45s linear infinite; }
+        .btn-ruleta.premio .dado { animation: saltito .5s cubic-bezier(.3,1.6,.5,1); }
+        @keyframes rodar { to { transform: rotate(360deg); } }
+        @keyframes saltito { 0% { transform: scale(.7); } 100% { transform: scale(1); } }
+        .ruleta-txt { flex: 1; min-width: 0; }
+        .ruleta-titulo {
+            display: block;
+            font-family: var(--marca);
+            font-weight: 600;
+            font-size: 1.12rem;
+            letter-spacing: 0.03em;
+            line-height: 1.15;
+            color: var(--oro);
+        }
+        .ruleta-sub {
+            display: block;
+            margin-top: 3px;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            color: rgba(255,255,255,0.58);
+        }
+        .ruleta-flecha { width: 18px; height: 18px; color: rgba(243,179,61,0.7); flex-shrink: 0; }
+
+        .hero .precio-wrap, .hero .ingredientes, .hero .nota-extra { transition: opacity .3s ease, filter .3s ease; }
+        .hero.ruleta-activa .precio-wrap,
+        .hero.ruleta-activa .ingredientes,
+        .hero.ruleta-activa .nota-extra { opacity: 0.25; filter: blur(1.5px); }
+        .hero.ruleta-activa .ingredientes { animation: none; }
+
+        .confeti {
+            position: fixed;
+            z-index: 60;
+            pointer-events: none;
+            border-radius: 2px;
+            will-change: transform, opacity;
+        }
+
         /* ── Bloque de precios ── */
         .precio-wrap {
             width: min(90vw, 460px);
@@ -1032,6 +1121,7 @@
             html { scroll-behavior: auto; }
             .carrusel-pista { scroll-behavior: auto; }
             .pizza-scene.pista .flecha { animation: none; }
+            .btn-ruleta::after, .btn-ruleta.girando .dado svg { animation: none; }
         }
     </style>
 </head>
@@ -1155,6 +1245,17 @@
 
         <p class="ingredientes" id="ingredientes" aria-live="polite"></p>
         <p class="nota-extra" id="notaExtra"></p>
+
+        <div class="ruleta-wrap">
+            <button class="btn-ruleta" id="btnRuleta" type="button">
+                <span class="dado"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><g fill="currentColor"><circle cx="8" cy="8" r="1.7"/><circle cx="16" cy="8" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="8" cy="16" r="1.7"/><circle cx="16" cy="16" r="1.7"/></g></svg></span>
+                <span class="ruleta-txt">
+                    <span class="ruleta-titulo" id="ruletaTitulo" aria-live="polite">Pizza sorpresa</span>
+                    <span class="ruleta-sub" id="ruletaSub">¿No sabes cuál? Que decida la suerte</span>
+                </span>
+                <svg class="ruleta-flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
+        </div>
     </section>
 
     <!-- ── Reseñas ── -->
@@ -1358,6 +1459,9 @@
                 abreHoy: h => `abre hoy a las ${h}`, abreManana: h => `abre mañana a las ${h}`,
                 abreDia: (dia, h) => `abre el ${dia.toLowerCase()} a las ${h}`,
                 fotoPronto: 'FOTO MUY PRONTO',
+                ruletaTitulo: 'Pizza sorpresa', ruletaSub: '¿No sabes cuál? Que decida la suerte',
+                ruletaGirando: '¡Girando…!', ruletaSuerte: '¡Suerte!',
+                ruletaToca: n => `¡Te ha tocado: ${n}!`, ruletaOtra: 'Toca otra vez para volver a tirar',
             },
             en: {
                 menuCarta: 'Menu', menuOpiniones: 'Reviews', menuPedir: 'Order',
@@ -1388,6 +1492,9 @@
                 abreHoy: h => `opens today at ${h}`, abreManana: h => `opens tomorrow at ${h}`,
                 abreDia: (dia, h) => `opens ${dia} at ${h}`,
                 fotoPronto: 'PHOTO COMING SOON',
+                ruletaTitulo: 'Surprise me!', ruletaSub: 'Can’t decide? Let luck choose',
+                ruletaGirando: 'Spinning…', ruletaSuerte: 'Good luck!',
+                ruletaToca: n => `You got: ${n}!`, ruletaOtra: 'Tap again to spin again',
             },
         };
 
@@ -1709,6 +1816,7 @@
         let rotation  = 0;
         let animating = false;
         let pendiente = 0;          // toques guardados si tocas mientras gira (+ adelante / − atrás)
+        let girandoRuleta = false;  // mientras gira la ruleta no se aceptan otros toques
         const DURACION = 800;
         const SWAP_EN  = 0.5;
 
@@ -1755,6 +1863,7 @@
         }
 
         function paso(dir) {
+            if (girandoRuleta) return;
             if (animating) {
                 if (Math.sign(pendiente) !== dir) pendiente = 0;   // cambio de sentido: anula lo anterior
                 pendiente = clamp(pendiente + dir, -3, 3);
@@ -1763,6 +1872,125 @@
             if (navigator.vibrate) { try { navigator.vibrate(8); } catch (e) {} }
             irAPizza((currentIndex + dir + N) % N, dir);
         }
+
+        /* ══════════════════════════════════════════════
+           RULETA — gira rápido, va pasando pizzas y frena en una al azar
+        ══════════════════════════════════════════════ */
+        const btnRuleta = $('btnRuleta');
+        let estadoRuleta = { modo: 'normal' }, timerPremio = null;
+
+        function pintarRuleta() {
+            const tit = $('ruletaTitulo'), sub = $('ruletaSub');
+            btnRuleta.classList.toggle('girando', estadoRuleta.modo === 'girando');
+            btnRuleta.classList.toggle('premio', estadoRuleta.modo === 'premio');
+            btnRuleta.disabled = estadoRuleta.modo === 'girando';
+            if (estadoRuleta.modo === 'girando') {
+                tit.textContent = t('ruletaGirando'); sub.textContent = t('ruletaSuerte');
+            } else if (estadoRuleta.modo === 'premio') {
+                tit.textContent = t('ruletaToca')(PIZZAS[estadoRuleta.idx].nombre); sub.textContent = t('ruletaOtra');
+            } else {
+                tit.textContent = t('ruletaTitulo'); sub.textContent = t('ruletaSub');
+            }
+        }
+
+        function confeti() {
+            if (reduceMotion || !arcDot.getBoundingClientRect) return;
+            const r = arcDot.getBoundingClientRect();
+            const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2;
+            const colores = ['#f3b33d', '#ffd27a', '#e4572e', '#ffffff', '#5fae4b', '#c9781a'];
+            for (let i = 0; i < 34; i++) {
+                const d = document.createElement('span');
+                d.className = 'confeti';
+                const w = 5 + Math.random() * 5, h = w * (0.5 + Math.random());
+                d.style.cssText = `left:${x0}px;top:${y0}px;width:${w}px;height:${h}px;background:${colores[i % colores.length]}`;
+                document.body.appendChild(d);
+                const ang = (-90 + (Math.random() - 0.5) * 150) * Math.PI / 180;
+                const v = 70 + Math.random() * 110;
+                const dx = Math.cos(ang) * v, dy = Math.sin(ang) * v;
+                const rot = (Math.random() - 0.5) * 720;
+                d.animate([
+                    { transform: 'translate(-50%,-50%) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${rot / 2}deg)`, opacity: 1, offset: 0.45 },
+                    { transform: `translate(calc(-50% + ${dx * 1.3}px), calc(-50% + ${dy + 140}px)) rotate(${rot}deg)`, opacity: 0 }
+                ], { duration: 1100 + Math.random() * 500, easing: 'cubic-bezier(.2,.7,.4,1)' }).onfinish = () => d.remove();
+            }
+        }
+
+        function ruleta() {
+            if (animating || girandoRuleta) return;
+            let destino;
+            do { destino = Math.floor(Math.random() * N); } while (destino === currentIndex && N > 1);
+
+            /* Que se vea la pizza mientras gira */
+            const top = scene.getBoundingClientRect().top;
+            if (top < 0) window.scrollTo({ top: Math.max(0, window.scrollY + top - 130), behavior: reduceMotion ? 'auto' : 'smooth' });
+
+            clearTimeout(timerPremio);
+            if (reduceMotion) {
+                irAPizza(destino);
+                estadoRuleta = { modo: 'premio', idx: destino }; pintarRuleta();
+                timerPremio = setTimeout(() => { estadoRuleta = { modo: 'normal' }; pintarRuleta(); }, 3500);
+                return;
+            }
+
+            girandoRuleta = animating = true;
+            pendiente = 0;
+            if (arcAnim) { cancelAnimationFrame(arcAnim); arcAnim = null; }
+            estadoRuleta = { modo: 'girando' }; pintarRuleta();
+            const hero = $('carta');
+            hero.classList.add('ruleta-activa');
+
+            const idx0 = currentIndex, ring0 = ringPos, rot0 = rotation;
+            const delta = (destino - idx0 + N) % N;
+            const pasos = N + delta;                        // una vuelta entera a la carta y aterriza
+            const DUR = 3400 + delta * 70;                  // ~3,5–4,2 s
+            const rotTotal = 360 * Math.max(4, Math.round(pasos / 3));   // vueltas completas: acaba derecha
+            const frena = x => 1 - Math.pow(1 - x, 4);      // rápido al principio, frena al final
+            let mostrado = idx0;
+            const t0 = performance.now();
+            container.style.transition = 'none';
+
+            function frame(now) {
+                const x = Math.min((now - t0) / DUR, 1);
+                const e = frena(x);
+                const sPos = pasos * e;
+                container.style.transform = `rotate(${rot0 + rotTotal * e}deg)`;
+                pintarArco(ring0 + sPos, (idx0 + sPos) % N);
+                const idx = (idx0 + Math.round(sPos)) % N;
+                if (idx !== mostrado) {
+                    pizzas[mostrado].classList.remove('active');
+                    pizzas[idx].classList.add('active');
+                    marcarActivo(idx);
+                    contador.innerHTML = `<b>${idx + 1}</b> / ${N}`;
+                    mostrado = idx;
+                    if (navigator.vibrate) { try { navigator.vibrate(5); } catch (err) {} }
+                }
+                if (x < 1) { requestAnimationFrame(frame); return; }
+
+                /* Aterriza */
+                rotation = rot0 + rotTotal;
+                ringPos = ring0 + pasos;
+                dotPos = destino;
+                currentIndex = destino;
+                pizzas.forEach((im, i) => im.classList.toggle('active', i === destino));
+                marcarActivo(destino);
+                pintarArco(ringPos, dotPos);
+                actualizarInfo(destino);
+                hero.classList.remove('ruleta-activa');
+                precargarVecinas(destino);
+                try { history.replaceState(null, '', '#' + PIZZAS[destino].id); } catch (err) {}
+                girandoRuleta = animating = false;
+                if (navigator.vibrate) { try { navigator.vibrate([30, 40, 60]); } catch (err) {} }
+                confeti();
+                estadoRuleta = { modo: 'premio', idx: destino }; pintarRuleta();
+                timerPremio = setTimeout(() => { estadoRuleta = { modo: 'normal' }; pintarRuleta(); }, 3500);
+            }
+            requestAnimationFrame(frame);
+        }
+
+        btnRuleta.addEventListener('click', ruleta);
+        pintarRuleta();
+        alCambiarIdioma.push(pintarRuleta);
 
         function precargarVecinas(i) {
             [i - 1, i + 1].forEach(j => {
