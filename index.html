@@ -3,8 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0a0a">
-    <meta name="description" content="Pizzería Torre del Oro: descubre nuestras pizzas, sus ingredientes y precios, enteras o por porción.">
+    <meta name="theme-color" content="#2c2d31">
+    <meta name="description" content="Pizzería Torre del Oro, en C. Almirante Lobo 2, Sevilla, junto a la Torre del Oro. Pizzas enteras o por porción, para llevar o en la terraza. Tel. 613 85 10 59.">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Restaurant",
+        "name": "Pizzería Torre del Oro",
+        "servesCuisine": "Pizza",
+        "priceRange": "€",
+        "telephone": "+34 613 85 10 59",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "C. Almirante Lobo, 2",
+            "postalCode": "41001",
+            "addressLocality": "Sevilla",
+            "addressCountry": "ES"
+        },
+        "geo": { "@type": "GeoCoordinates", "latitude": 37.382136, "longitude": -5.9949132 },
+        "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJXYbqyJJtEg0RcgO9WeKWAvs",
+        "sameAs": ["https://www.instagram.com/pizzeria_torredeloro/"],
+        "openingHoursSpecification": [
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Sunday"], "opens": "12:00", "closes": "17:00" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Wednesday", "Thursday"], "opens": "12:00", "closes": "23:00" },
+            { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Friday", "Saturday"], "opens": "12:00", "closes": "23:59" }
+        ]
+    }
+    </script>
     <title>Pizzería Torre del Oro</title>
     <link rel="preload" as="image" href="img/margherita.webp">
     <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
@@ -48,29 +73,47 @@
             --oro: #f3b33d;
             --marca: 'Oswald', 'Arial Narrow', 'Segoe UI', sans-serif;
             --ancho-referencia: 800px;
-            --ancho-total: min(90vw, var(--ancho-referencia));
-            --alto-banner: 550px;
-            --banner-desde-arriba: 95px;
-            --alto-escena: calc(var(--banner-desde-arriba) + var(--alto-banner));
+            --alto-header: 80px;
+            --reserva: 450px;        /* alto que ocupa todo lo que no es pizza en la primera pantalla */
+            --ancho-vw: 90vw;        /* ancho máximo de la pizza respecto a la pantalla */
+            --ancho-total: min(var(--ancho-vw), var(--ancho-referencia));
+            --alto-banner: calc(var(--ancho-total) * 0.6875);
+            --banner-desde-arriba: calc(var(--ancho-total) * 0.11875);
+            --fondo-cabecera: rgba(44, 45, 49, 0.92);
+        }
+        /* La pizza se encoge si la pantalla es baja, para que quepan también los precios */
+        @supports (height: 100svh) {
+            :root {
+                --ancho-total: min(var(--ancho-vw), var(--ancho-referencia), max(230px, calc((100svh - var(--reserva)) / 0.63)));
+            }
         }
 
         @media (max-width: 800px) {
             :root {
-                --alto-banner: calc(600px * (var(--ancho-total) / 800px));
-                --banner-desde-arriba: calc(75px * (var(--ancho-total) / 800px));
+                --alto-banner: calc(var(--ancho-total) * 0.75);
+                --banner-desde-arriba: calc(var(--ancho-total) * 0.09375);
+            }
+        }
+        @media (max-width: 700px) {
+            :root {
+                --alto-header: 58px;
+                --reserva: 382px;
             }
         }
 
         /* ── Cabecera ── */
         .top-menu {
             width: 100%;
-            height: 80px;
+            height: var(--alto-header);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 5vw;
-            background: #0a0a0a;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: var(--fondo-cabecera);
+            backdrop-filter: blur(12px) saturate(1.2);
+            -webkit-backdrop-filter: blur(12px) saturate(1.2);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.18);
             position: sticky;
             top: 0;
             z-index: 999;
@@ -119,18 +162,14 @@
 
         @media (max-width: 700px) {
             .top-menu {
-                height: auto;
                 justify-content: center;
-                padding: 20px;
-            }
-            .top-menu {
-                padding: 12px 20px;
+                padding: 0 20px;
             }
             .top-menu nav { display: none; }
-            .logo { gap: 10px; }
-            .logo-icono { height: 40px; width: calc(40px * 907 / 504); }
-            .logo-pizzeria { font-size: 10px; letter-spacing: 0.5em; }
-            .logo-marca { height: 25px; width: calc(25px * 1257 / 301); }
+            .logo { gap: 9px; }
+            .logo-icono { height: 34px; width: calc(34px * 907 / 504); }
+            .logo-pizzeria { font-size: 9px; letter-spacing: 0.5em; }
+            .logo-marca { height: 21px; width: calc(21px * 1257 / 301); }
         }
 
         /* ── Hero ── */
@@ -141,9 +180,13 @@
             align-items: center;
             overflow-x: clip;
             overflow-y: visible;
-            padding: 6px 0 0;
+            justify-content: flex-start;
+            min-height: calc(100vh - var(--alto-header));
+            min-height: calc(100svh - var(--alto-header));
+            padding: 18px 0 22px;
             scroll-margin-top: 80px;
         }
+        @media (max-width: 700px) { .hero { padding: 10px 0 14px; } }
 
         /* ── Arco selector (rueda) ── */
         .arc-selector-wrap {
@@ -193,10 +236,12 @@
         .pizza-scene {
             position: relative;
             width: var(--ancho-total);
-            height: var(--alto-escena);
+            height: calc(var(--ancho-total) * 0.63);
             margin: 0 auto;
             background-color: var(--background_color);
             overflow: hidden;
+            -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--ancho-total) * 0.1), transparent);
+                    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--ancho-total) * 0.1), transparent);
         }
 
         .pizza-clip {
@@ -241,7 +286,7 @@
         /* Flechas laterales: toca izquierda = anterior, derecha = siguiente */
         .flecha {
             position: absolute;
-            top: calc(var(--ancho-total) / 4);
+            top: calc(var(--ancho-total) * 0.38);
             transform: translateY(-50%);
             z-index: 15;
             width: clamp(34px, 7vw, 46px);
@@ -260,8 +305,8 @@
             -webkit-tap-highlight-color: transparent;
         }
         .flecha svg { width: 45%; height: 45%; }
-        .flecha-izq { left: 4px; }
-        .flecha-der { right: 4px; }
+        .flecha-izq { left: max(4px, calc(var(--ancho-total) * 0.03)); }
+        .flecha-der { right: max(4px, calc(var(--ancho-total) * 0.03)); }
         .flecha:hover,
         .pizza-scene.lado-izq .flecha-izq,
         .pizza-scene.lado-der .flecha-der {
@@ -335,55 +380,58 @@
             );
         }
 
-        .exceso-negro {
-            width: 100%;
-            background-color: var(--background_color);
-            height: calc(var(--alto-escena) - var(--banner-desde-arriba) - var(--alto-banner));
-        }
-
         .instrucciones {
             position: relative;
-            margin-top: -22px;
-            color: #bbb;
-            font-size: clamp(0.75rem, 3.4vw, 0.9rem);
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            padding: 6px 18px;
+            color: rgba(255,255,255,0.62);
+            font-size: clamp(0.76rem, 3.3vw, 0.88rem);
+            background: rgba(0,0,0,0.28);
+            border: 1px solid rgba(255,255,255,0.07);
+            padding: 6px 16px;
             border-radius: 50px;
             pointer-events: none;
-            z-index: 20;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            z-index: 21;
             white-space: nowrap;
+            margin-top: clamp(12px, 3.2vw, 18px);
         }
         .instrucciones b { color: var(--oro); font-weight: 600; }
         @media (max-width: 400px) { .solo-ancho { display: none; } }
-        .contador {
-            font-variant-numeric: tabular-nums;
-            color: rgba(255,255,255,0.45);
-            border-left: 1px solid rgba(255,255,255,0.15);
-            padding-left: 10px;
+        @media (max-height: 620px) and (max-width: 700px) {
+            .instrucciones { margin-top: 8px; padding: 5px 14px; }
+            .ingredientes { margin-top: 8px; }
+            .hero { padding: 6px 0 8px; }
+            .precio-wrap { margin-top: 8px; }
+            .precio-card { padding: 7px 12px 8px; }
         }
+
+        .contador-pizza {
+            position: relative;
+            z-index: 20;
+            margin-top: calc(var(--ancho-total) * -0.075);
+            font-family: var(--marca);
+            font-size: clamp(0.85rem, 3.6vw, 1rem);
+            letter-spacing: 0.22em;
+            color: rgba(255,255,255,0.4);
+            font-variant-numeric: tabular-nums;
+        }
+        .contador-pizza b { color: var(--oro); font-weight: 600; }
 
         /* ── Ingredientes ── */
         .ingredientes {
-            width: var(--ancho-total);
-            margin: 16px auto 0;
+            width: min(92vw, 640px);
+            margin: clamp(12px, 3.2vw, 18px) auto 0;
             min-height: 30px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            align-content: center;
-            gap: 7px 7px;
+            align-content: flex-start;
+            gap: 6px;
         }
         .ingredientes .ing {
             white-space: nowrap;
             color: rgba(255,255,255,0.78);
-            font-size: clamp(0.8rem, 3.3vw, 0.92rem);
+            font-size: clamp(0.76rem, 3.2vw, 0.9rem);
             line-height: 1;
-            padding: 7px 12px;
+            padding: 6px 10px;
             border-radius: 30px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(243,179,61,0.22);
@@ -395,7 +443,7 @@
         .ingredientes.cambiando { animation: ingEntra .35s ease both; }
 
         .nota-extra {
-            margin-top: 10px;
+            margin-top: 8px;
             font-size: clamp(0.72rem, 3vw, 0.82rem);
             color: rgba(255,255,255,0.42);
             letter-spacing: 0.02em;
@@ -405,26 +453,28 @@
 
         /* ── Bloque de precios ── */
         .precio-wrap {
-            width: var(--ancho-total);
-            max-width: var(--ancho-referencia);
-            margin: 22px auto 36px;
+            width: min(90vw, 460px);
+            margin: clamp(12px, 3.2vw, 18px) auto 0;
             display: flex;
-            gap: clamp(10px, 3vw, 20px);
             align-items: stretch;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 18px;
+            overflow: hidden;
         }
 
         .precio-card {
             flex: 1;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 18px;
-            padding: clamp(16px, 4vw, 26px) clamp(14px, 3vw, 22px);
+            padding: 10px 12px 11px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            align-items: center;
+            gap: 2px;
             position: relative;
             overflow: hidden;
         }
+        .precio-card .precio-nombre,
+        .precio-card .precio-sub { display: none; }
 
         .precio-card::before {
             content: '';
@@ -457,18 +507,19 @@
             display: flex;
             align-items: baseline;
             gap: 2px;
-            margin-top: 6px;
+            margin-top: 2px;
+            min-height: 1.75em;
         }
 
         .precio-num {
             font-family: var(--marca);
-            font-size: clamp(1.8rem, 7vw, 2.8rem);
+            font-size: clamp(1.65rem, 6.8vw, 2.3rem);
             font-weight: 600;
             color: var(--oro);
             line-height: 1;
             letter-spacing: -0.02em;
         }
-        .sin-porcion .precio-num { font-size: clamp(1rem, 4vw, 1.4rem); }
+        .sin-porcion .precio-num { font-size: clamp(0.95rem, 4vw, 1.2rem); align-self: center; }
         .sin-porcion .precio-euro { display: none; }
 
         .precio-euro {
@@ -489,9 +540,8 @@
 
         .precio-sep {
             width: 1px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 1px;
-            align-self: stretch;
+            background: rgba(255,255,255,0.1);
+            margin: 12px 0;
             flex-shrink: 0;
         }
 
@@ -509,16 +559,29 @@
                 inset: 0;
                 width: 100%;
                 max-width: none;
+                margin: 0;
                 pointer-events: none;
                 z-index: 30;
+                background: none;
+                border: 0;
+                border-radius: 0;
+                overflow: visible;
             }
             .precio-card {
                 width: 220px;
                 position: absolute;
-                top: 340px;
+                top: 42%;
+                align-items: flex-start;
+                padding: 24px 22px;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(255,255,255,0.09);
+                border-radius: 18px;
                 pointer-events: auto;
                 backdrop-filter: blur(10px);
             }
+            .precio-card .precio-nombre { display: block; }
+            .precio-card .precio-sub { display: block; }
+            .sin-porcion .precio-sub { display: none; }
             #card-porcion { left: 40px; }
             #card-entera { right: 40px; }
             .precio-sep { display: none; }
@@ -622,23 +685,69 @@
         .resena-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .estrellas { color: var(--oro); letter-spacing: 2px; font-size: 1rem; }
         .estrellas .vacia { color: rgba(255,255,255,0.18); }
-        .tag-ejemplo {
-            font-size: 0.6rem;
-            letter-spacing: 0.14em;
+        .resena-pizza {
+            font-family: var(--marca);
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
             text-transform: uppercase;
-            border: 1px dashed rgba(255,255,255,0.35);
-            color: rgba(255,255,255,0.55);
-            padding: 2px 8px;
+            color: var(--oro);
+            text-decoration: none;
+            border: 1px solid rgba(243,179,61,0.35);
+            padding: 4px 10px;
             border-radius: 20px;
             margin-right: 34px;
+            white-space: nowrap;
+            transition: background .25s ease;
         }
+        .resena-pizza:hover { background: rgba(243,179,61,0.12); }
 
         .resena-texto {
             color: rgba(255,255,255,0.84);
             font-size: 0.98rem;
             line-height: 1.55;
             flex: 1;
+            white-space: pre-line;
         }
+
+        /* Nota media de Google */
+        .nota-google {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 8px 18px 8px 14px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            color: #fff;
+            text-decoration: none;
+            transition: border-color .25s ease, background .25s ease;
+        }
+        .nota-google:hover { border-color: rgba(243,179,61,0.45); background: rgba(243,179,61,0.07); }
+        .nota-num {
+            font-family: var(--marca);
+            font-weight: 600;
+            font-size: 1.9rem;
+            line-height: 1;
+            color: var(--oro);
+        }
+        .nota-detalle { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+        .nota-estrellas {
+            position: relative;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            line-height: 1;
+            color: rgba(255,255,255,0.18);
+        }
+        .nota-estrellas span {
+            position: absolute;
+            inset: 0 auto 0 0;
+            overflow: hidden;
+            white-space: nowrap;
+            color: var(--oro);
+        }
+        .nota-txt { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+        .g-logo { width: 14px; height: 14px; vertical-align: -2px; margin-left: 2px; }
 
         .resena-autor { display: flex; align-items: center; gap: 12px; }
         .avatar {
@@ -691,7 +800,7 @@
         }
         .carrusel-puntos button.activo { width: 24px; background: var(--oro); }
 
-        .resenas-cta { display: flex; justify-content: center; margin-top: 26px; }
+        .resenas-cta { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 26px; padding: 0 16px; }
 
         /* ── Botones ── */
         .btn {
@@ -745,27 +854,103 @@
             flex-wrap: wrap;
             margin-top: 24px;
         }
-        .contacto-datos {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px 28px;
-            margin-top: 28px;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.92rem;
+        .estado {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-top: 16px;
+            padding: 7px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.75);
         }
-        .contacto-datos li { display: flex; align-items: center; gap: 8px; }
-        .contacto-datos svg { width: 16px; height: 16px; color: var(--oro); }
+        .estado:empty { display: none; }
+        .estado b { font-weight: 700; }
+        .estado .punto {
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            background: #9a9a9a;
+            flex-shrink: 0;
+        }
+        .estado.abierto b { color: #4cd47b; }
+        .estado.abierto .punto { background: #4cd47b; box-shadow: 0 0 0 0 rgba(76,212,123,0.6); animation: latido 2s infinite; }
+        .estado.cerrado b { color: #ff8a7a; }
+        .estado.cerrado .punto { background: #ff8a7a; }
+        @keyframes latido {
+            0%   { box-shadow: 0 0 0 0 rgba(76,212,123,0.55); }
+            70%  { box-shadow: 0 0 0 9px rgba(76,212,123,0); }
+            100% { box-shadow: 0 0 0 0 rgba(76,212,123,0); }
+        }
+
+        .ficha {
+            width: min(92vw, 720px);
+            margin: 32px auto 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            text-align: left;
+        }
+        @media (max-width: 640px) { .ficha { grid-template-columns: 1fr; } }
+        .ficha-bloque {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 20px 20px 18px;
+        }
+        .ficha-titulo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--marca);
+            font-weight: 500;
+            font-size: 0.8rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--oro);
+            margin-bottom: 12px;
+        }
+        .ficha-titulo svg { width: 16px; height: 16px; }
+        .ficha-texto { color: rgba(255,255,255,0.82); line-height: 1.55; font-size: 0.95rem; }
+        .ficha-texto small { display: block; color: rgba(255,255,255,0.45); font-size: 0.82rem; margin-top: 4px; }
+        .ficha-enlaces { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+        .btn-mini { padding: 9px 16px; font-size: 0.9rem; }
+        .btn-mini svg { width: 16px; height: 16px; }
+
+        .horario { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        .horario td { padding: 6px 0; color: rgba(255,255,255,0.72); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .horario tr:last-child td { border-bottom: 0; }
+        .horario td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+        .horario .cerrado-dia td:last-child { color: rgba(255,255,255,0.35); }
+        .horario .hoy td { color: #fff; font-weight: 700; }
+        .horario .hoy td:first-child::after {
+            content: 'hoy';
+            font-family: var(--marca);
+            font-weight: 500;
+            font-size: 0.66rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #151515;
+            background: var(--oro);
+            border-radius: 10px;
+            padding: 2px 7px;
+            margin-left: 8px;
+            vertical-align: 1px;
+        }
 
         footer {
-            background: #0a0a0a;
+            background: #26272b;
+            border-top: 1px solid rgba(255,255,255,0.05);
             color: rgba(255,255,255,0.35);
             text-align: center;
             font-size: 0.78rem;
             padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
         }
         footer b { color: var(--oro); font-family: var(--marca); font-weight: 500; letter-spacing: 0.12em; }
+        footer a { color: rgba(255,255,255,0.55); text-decoration: none; }
+        @media (max-width: 700px) { footer b { display: block; margin-bottom: 6px; } }
+        footer a:hover { color: var(--oro); }
 
         /* ── Botón flotante (móvil) ── */
         .fab-pedir {
@@ -864,17 +1049,14 @@
 
             <div class="mask-container">
                 <div class="banner-img"></div>
-                <div class="exceso-negro"></div>
             </div>
         </div>
 
-        <p class="instrucciones">
-            <span><b>‹</b> Toca un lado <span class="solo-ancho">de la pizza </span>para cambiar <b>›</b></span>
-            <span class="contador" id="contador">1/12</span>
-        </p>
+        <p class="contador-pizza" id="contador" aria-live="polite"><b>1</b> / 12</p>
 
-        <p class="ingredientes" id="ingredientes" aria-live="polite"></p>
-        <p class="nota-extra" id="notaExtra"></p>
+        <p class="instrucciones">
+            <b>‹</b> Toca un lado <span class="solo-ancho">de la pizza </span>para cambiar <b>›</b>
+        </p>
 
         <div class="precio-wrap">
             <div class="precio-card" id="card-porcion">
@@ -899,6 +1081,9 @@
                 <div class="precio-sub" id="sub-entera">Precio por pizza</div>
             </div>
         </div>
+
+        <p class="ingredientes" id="ingredientes" aria-live="polite"></p>
+        <p class="nota-extra" id="notaExtra"></p>
     </section>
 
     <!-- ── Reseñas ── -->
@@ -906,7 +1091,13 @@
         <div class="seccion-cabecera">
             <div class="sobretitulo">Opiniones</div>
             <h2 class="seccion-titulo">Lo que dicen de nosotros</h2>
-            <p class="seccion-sub">Desliza para leer más</p>
+            <a class="nota-google" id="notaGoogle" target="_blank" rel="noopener">
+                <span class="nota-num" id="notaNum">4,9</span>
+                <span class="nota-detalle">
+                    <span class="nota-estrellas" aria-hidden="true">★★★★★<span id="notaRelleno">★★★★★</span></span>
+                    <span class="nota-txt" id="notaTxt">576 opiniones en Google</span>
+                </span>
+            </a>
         </div>
 
         <div class="carrusel" id="carrusel">
@@ -923,7 +1114,8 @@
         </div>
 
         <div class="resenas-cta">
-            <a class="btn btn-borde" id="btnResena" target="_blank" rel="noopener">
+            <a class="btn btn-borde" id="btnVerTodas" target="_blank" rel="noopener">Ver todas en Google</a>
+            <a class="btn btn-oro" id="btnResena" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>
                 Déjanos tu reseña
             </a>
@@ -939,6 +1131,7 @@
             <div class="sobretitulo">¿Te apetece?</div>
             <h2 class="seccion-titulo">Recién salida del horno</h2>
             <p class="seccion-sub">Llámanos o escríbenos y te la preparamos.</p>
+            <p class="estado" id="estado" aria-live="polite"></p>
 
             <div class="contacto-botones">
                 <a class="btn btn-oro" id="btnLlamar">
@@ -951,22 +1144,26 @@
                 </a>
             </div>
 
-            <ul class="contacto-datos">
-                <li id="datoDireccion">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
-                    <span></span>
-                </li>
-                <li id="datoHorario">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                    <span></span>
-                </li>
-            </ul>
+            <div class="ficha">
+                <div class="ficha-bloque">
+                    <div class="ficha-titulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg> Dónde estamos</div>
+                    <p class="ficha-texto"><span id="datoDireccion"></span><small>A un paso de la Torre del Oro</small></p>
+                    <div class="ficha-enlaces">
+                        <a class="btn btn-borde btn-mini" id="btnRuta" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg> Cómo llegar</a>
+                        <a class="btn btn-borde btn-mini" id="btnInstagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg> Instagram</a>
+                    </div>
+                </div>
+                <div class="ficha-bloque">
+                    <div class="ficha-titulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Horario</div>
+                    <table class="horario" id="tablaHorario"></table>
+                </div>
+            </div>
         </div>
     </section>
     </main>
 
     <footer>
-        <b>PIZZERÍA TORRE DEL ORO</b> · © <span id="anio">2026</span>
+        <b>PIZZERÍA TORRE DEL ORO</b> · <a id="pieDireccion" target="_blank" rel="noopener">C. Almirante Lobo, 2 · Sevilla</a> · © <span id="anio">2026</span>
     </footer>
 
     <a class="btn btn-oro fab-pedir" id="fabPedir" href="#contacto">
@@ -983,13 +1180,27 @@
            (si dejas un campo vacío '', ese botón/dato se oculta)
         ══════════════════════════════════════════════ */
         const CONFIG = {
-            telefono:   '+34 600 000 000',          // ← CAMBIAR por el teléfono real
-            whatsapp:   '34600000000',              // ← CAMBIAR: número con prefijo, sin + ni espacios
+            telefono:   '613 85 10 59',
+            whatsapp:   '34613851059',              // número con prefijo, sin + ni espacios ('' para ocultar el botón)
             mensajeWhatsapp: '¡Hola! Quería hacer un pedido 🍕',
-            direccion:  'Dirección de la pizzería', // ← CAMBIAR
-            horario:    'Horario de apertura',      // ← CAMBIAR
-            urlResena:  '',                         // ← enlace "Pedir reseñas" de vuestro perfil de Google
+            direccion:  'C. Almirante Lobo, 2 · 41001 Sevilla',
+            instagram:  'pizzeria_torredeloro',
+            /* Ficha de Google Maps (identificador de la pizzería en Google) */
+            googlePlaceId: 'ChIJXYbqyJJtEg0RcgO9WeKWAvs',
+            notaGoogle: 4.9,                        // nota media en Google (actualízala de vez en cuando)
+            opinionesGoogle: 576,                   // nº de opiniones en Google
             precioExtra: 0.60,                      // ingrediente extra (0 o null para ocultar la nota)
+        };
+
+        /* Horario (hora de Sevilla). null = cerrado. '24:00' = medianoche */
+        const HORARIO = {
+            lunes:     null,
+            martes:    ['12:00', '17:00'],
+            miercoles: ['12:00', '23:00'],
+            jueves:    ['12:00', '23:00'],
+            viernes:   ['12:00', '24:00'],
+            sabado:    ['12:00', '24:00'],
+            domingo:   ['12:00', '17:00'],
         };
 
         /* ══════════════════════════════════════════════
@@ -1001,7 +1212,7 @@
               ingredientes: ['Tomate', 'Mozzarella', 'Orégano'] },
             { id: 'salvatore',     nombre: 'Salvatore',     precio: 12.00, porcion: 4,    img: 'img/salvatore.webp',
               ingredientes: ['Tomate', 'Mozzarella', 'Anchoas', 'Alcaparras'] },
-            { id: 'cotto',         nombre: 'Cotto',         precio: 10.50, porcion: 4,    img: null,
+            { id: 'cotto',         nombre: 'Cotto',         precio: 10.50, porcion: 4,    img: 'img/cotto.webp',
               ingredientes: ['Tomate', 'Mozzarella', 'Jamón cocido', 'Orégano'] },
             { id: 'barbacoa',      nombre: 'Barbacoa',      precio: 12.50, porcion: 4,    img: 'img/barbacoa.webp',
               ingredientes: ['Salsa BBQ casera', 'Mozzarella', 'Bacon', 'Ternera', 'Orégano'] },
@@ -1009,7 +1220,7 @@
               ingredientes: ['Tomate', 'Mozzarella', 'Salchicha picante', 'Orégano'] },
             { id: 'carbonara',     nombre: 'Carbonara',     precio: 12.50, porcion: 4,    img: 'img/carbonara.webp',
               ingredientes: ['Nata', 'Mozzarella', 'Bacon', 'Champiñón', 'Cebolla morada', 'Parmesano', 'Pimienta negra'] },
-            { id: 'tonno',         nombre: 'Tonno',         precio: 11.00, porcion: 4,    img: null,
+            { id: 'tonno',         nombre: 'Tonno',         precio: 11.00, porcion: 4,    img: 'img/tonno.webp',
               ingredientes: ['Tomate', 'Mozzarella', 'Atún', 'Cebolla morada', 'Aceituna negra', 'Orégano'] },
             { id: 'calzone',       nombre: 'Calzone',       precio: 12.00, porcion: null, img: 'img/calzone.webp',
               ingredientes: ['Tomate', 'Mozzarella', 'Jamón', 'Champiñón', 'Orégano'] },
@@ -1019,26 +1230,24 @@
               ingredientes: ['Tomate', 'Mozzarella', 'Rúcula', 'Tomate cherry', 'Jamón serrano', 'Parmesano', 'Aceite picante'] },
             { id: '4-formaggi',    nombre: '4 Formaggi',    precio: 12.00, porcion: 4,    img: 'img/4-formaggi.webp',
               ingredientes: ['Nata', 'Mozzarella', 'Queso de cabra', 'Gorgonzola', 'Parmesano', 'Pimienta negra', 'Orégano'] },
-            { id: 'dolce',         nombre: 'Dolce',         precio: 6.50,  porcion: null, img: null,
+            { id: 'dolce',         nombre: 'Dolce',         precio: 6.50,  porcion: null, img: 'img/dolce.webp',
               ingredientes: ['Nutella', 'Oreo'] },
         ];
 
         /* ══════════════════════════════════════════════
-           RESEÑAS — pon aquí reseñas REALES de clientes
-           (p. ej. copiadas de Google Maps). Las de ejemplo
-           llevan ejemplo: true y salen marcadas como "Ejemplo".
+           RESEÑAS — reseñas reales de Google Maps, copiadas tal cual
+           (solo el nombre va abreviado). pizza: id de la carta → sale
+           un botón que lleva a esa pizza.
         ══════════════════════════════════════════════ */
         const RESENAS = [
-            { nombre: 'Cliente de ejemplo', estrellas: 5, fecha: 'hace 1 semana',  fuente: 'Google', ejemplo: true,
-              texto: 'Masa fina y con el borde crujiente, de las que da gusto comer. Repetiremos seguro.' },
-            { nombre: 'Cliente de ejemplo', estrellas: 5, fecha: 'hace 2 semanas', fuente: 'Google', ejemplo: true,
-              texto: 'Pedimos la Torre del Oro y llegó caliente y en su punto. El jamón con la rúcula, un acierto.' },
-            { nombre: 'Cliente de ejemplo', estrellas: 4, fecha: 'hace 1 mes',     fuente: 'Google', ejemplo: true,
-              texto: 'Lo de poder pedir por porción está genial para comer algo rápido. Buen precio.' },
-            { nombre: 'Cliente de ejemplo', estrellas: 5, fecha: 'hace 1 mes',     fuente: 'Google', ejemplo: true,
-              texto: 'Trato muy amable y la pizza, de horno de verdad. Se nota en el sabor.' },
-            { nombre: 'Cliente de ejemplo', estrellas: 5, fecha: 'hace 2 meses',   fuente: 'Google', ejemplo: true,
-              texto: 'La Salvatore con anchoas y alcaparras es otro nivel. Muy recomendable.' },
+            { nombre: 'Nuna C.',     estrellas: 5, fecha: 'enero 2026',   fuente: 'Google',
+              texto: 'El sitio es genial la pizza es deliciosa pídete una entera porque te la comes seguro. la masa súper fina y crujiente, los chicos son encantadores, tiene mesa fuera para poder disfrutar de las vistas a la torre del oro.\nY lo mejor de todos son los precios. Comer tan bien por este dinero en el centro de Sevilla es realmente difícil….' },
+            { nombre: 'Franesca G.', estrellas: 5, fecha: 'octubre 2026', fuente: 'Google', pizza: 'cotto',
+              texto: 'Comer pizza en Sevilla!! Es un SÍ\nMuy rica, la atención 10/10, y de sabor un 10.\n\nMasa delgada, precio buenos y atención buena' },
+            { nombre: 'Sonia D.',    estrellas: 5, fecha: 'octubre 2026', fuente: 'Google', pizza: 'dolce',
+              texto: 'La dolce está deliciosa y la atención de 10.\nEl dependiente es encantador.\nPor eso se merece la mejor puntuación.' },
+            { nombre: 'Rosana P.',   estrellas: 5, fecha: 'octubre 2026', fuente: 'Google',
+              texto: 'Pizzas muy ricas, muy amables, siempre que puedo vengo a comer ya que trabajo en una oficina al lado.' },
         ];
 
         /* ── Utilidades ── */
@@ -1115,10 +1324,11 @@
             let max = 0;
             PIZZAS.forEach(p => {
                 ingEl.innerHTML = p.ingredientes.map(t => `<span class="ing">${esc(t)}</span>`).join('');
-                max = Math.max(max, ingEl.offsetHeight);
+                max = Math.max(max, ingEl.getBoundingClientRect().height);
             });
             ingEl.innerHTML = actual;
-            ingEl.style.minHeight = max + 'px';
+            /* Los ingredientes van al final: ya no hace falta reservar alto (nada de debajo es crítico) */
+            ingEl.style.minHeight = '';
         }
 
         function actualizarInfo(idx) {
@@ -1140,14 +1350,14 @@
 
             ingEl.innerHTML = p.ingredientes.map(t => `<span class="ing">${esc(t)}</span>`).join('');
             reanimar(ingEl, 'cambiando');
-            contador.textContent = `${idx + 1}/${N}`;
+            contador.innerHTML = `<b>${idx + 1}</b> / ${N}`;
         }
 
         /* ══════════════════════════════════════════════
-           ARCO / RUEDA DE NOMBRES
-           · Pantalla ancha  → arco fijo con todas, el punto viaja
-           · Móvil / tablet  → rueda: la pizza activa siempre arriba
-             en el centro y los nombres giran con la pizza
+           AUREOLA DE NOMBRES — un círculo alrededor de la pizza
+           · Si caben las 12 (pantalla ancha) → aureola fija y el punto viaja
+           · Si no (móvil / tablet) → rueda: la activa siempre arriba y la
+             aureola gira con la pizza
         ══════════════════════════════════════════════ */
         const svg      = $('arc-svg');
         const arcWrap  = $('arcWrap');
@@ -1159,24 +1369,11 @@
         const scene    = $('pizzaScene');
         const FUENTE   = "'Oswald', 'Arial Narrow', 'Segoe UI', sans-serif";
         const medidor  = document.createElement('canvas').getContext('2d');
+        const GRAD     = Math.PI / 180;
 
-        function anchoTexto(t, fs, ls) {
-            medidor.font = `700 ${fs}px ${FUENTE}`;
+        function anchoTexto(t, fs, ls, peso) {
+            medidor.font = `${peso || 700} ${fs}px ${FUENTE}`;
             return medidor.measureText(t).width + ls * t.length;
-        }
-
-        function partirNombre(nombre, fs, ls, maxW) {
-            const up = nombre.toUpperCase();
-            if (anchoTexto(up, fs, ls) <= maxW) return [up];
-            const w = up.split(' ');
-            if (w.length < 2) return [up];
-            let mejor = [up], mejorW = Infinity;
-            for (let c = 1; c < w.length; c++) {
-                const a = w.slice(0, c).join(' '), b = w.slice(c).join(' ');
-                const m = Math.max(anchoTexto(a, fs, ls), anchoTexto(b, fs, ls));
-                if (m < mejorW) { mejorW = m; mejor = [a, b]; }
-            }
-            return mejor;
         }
 
         let geo = null;
@@ -1192,60 +1389,52 @@
             return k;
         }
 
-        function punto(k) {
-            const th = k * geo.delta;
-            return { x: geo.cx + geo.r * Math.sin(th), y: geo.cy - geo.r * Math.cos(th) };
+        /* Punto de la aureola: ángulo 0 = arriba, positivo hacia la derecha */
+        function enAureola(th, r) {
+            return { x: geo.cx + r * Math.sin(th), y: geo.cy - r * Math.cos(th) };
         }
 
         function calcularGeo() {
-            const W = Math.max(280, Math.round(arcWrap.clientWidth));
-            const modo = W >= 860 ? 'fijo' : 'rueda';
-            const fs   = modo === 'fijo' ? clamp(W * 0.0135, 13, 15.5) : clamp(W * 0.033, 11.5, 14);
-            const fsA  = fs * 1.18;
-            const ls   = modo === 'fijo' ? 1 : 0.6;
-            const lineH = fsA * 1.18;
-            const r     = modo === 'fijo' ? W * 0.78 : W * 0.95;
-            const kEdge = modo === 'fijo' ? (N - 1) / 2 : (W < 360 ? 2.6 : 3);
-            const reach = modo === 'fijo' ? W * 0.41 : W * 0.47;
-            const delta = Math.asin(Math.min(reach / r, 0.98)) / kEdge;
-            const dotR  = clamp(W * 0.0095, 4.5, 8.5);
-            const fuera = fs * 1.15, dentro = fs * 0.9;
-            const slot  = r * delta;
-            const maxW  = 2 * slot * (modo === 'fijo' ? 0.9 : 1.15) - 8;
-            const lineas = PIZZAS.map(p => partirNombre(p.nombre, fsA, ls, maxW));
-            const maxLin = Math.max(...lineas.map(l => l.length));
-            const topY = Math.ceil(dotR * 1.8 + fuera + maxLin * lineH + 4);
+            const W      = Math.max(280, Math.round(arcWrap.clientWidth));
             const sceneW = scene.clientWidth;
-            return { W, modo, fs, fsA, ls, lineH, r, kEdge, delta, dotR, fuera, dentro, slot, lineas,
-                     topY, cx: W / 2, cy: topY + r, pizzaR: sceneW / 2 * 0.985 };
+            const Rp     = sceneW / 2;                       // el centro de la pizza es el borde inferior del recorte
+            const movil  = sceneW < 600;
+            const fs     = movil ? clamp(sceneW * 0.036, 11.5, 13.5) : clamp(sceneW * 0.018, 13, 15);
+            const fsA    = fs * (movil ? 1.2 : 1.14);
+            const ls     = movil ? 0.6 : 1;
+            const dotR   = clamp(sceneW * 0.011, 4, 7);
+            const Rn     = Rp + clamp(sceneW * 0.045, 14, 32);   // radio de los puntos
+            const guia   = fs * 0.75;
+            const Rt     = Rn + dotR * 1.8 + guia;              // base del texto
+            const nombres = PIZZAS.map(p => p.nombre.toUpperCase());
+            const wA = nombres.map(t => anchoTexto(t, fsA, ls, 700));
+            const wN = nombres.map(t => anchoTexto(t, fs, ls, 500));
+            const rMedio = Rt + fs * 0.45;
+            /* separación angular necesaria entre vecinos (con uno de los dos activo) */
+            let need = 0;
+            for (let i = 0; i < N; i++) {
+                const j = (i + 1) % N;
+                need = Math.max(need, (wA[i] + wN[j]) / 2, (wN[i] + wA[j]) / 2);
+            }
+            const deltaMin = (need + 12) / rMedio;
+            /* ¿caben las 12 en ±84° sin salirse por los lados? */
+            const SPAN = 84 * GRAD;
+            const deltaFijo = 2 * SPAN / (N - 1);
+            const salida = (Rt + fsA * 1.1) * Math.sin(SPAN) + Math.max(...wN) / 2 * Math.cos(SPAN);
+            const fijo = deltaFijo >= deltaMin && salida <= W / 2 - 8;
+            const delta = fijo ? deltaFijo : Math.max(deltaMin, 15 * GRAD);
+            const kEdge = fijo ? (N - 1) / 2 : Math.max(2, Math.floor(((movil ? 58 : 76) * GRAD) / delta + 0.001));
+            const cy = Math.ceil(Rt + fsA * 1.15 + 4);          // centro del círculo en el SVG
+            return { W, sceneW, Rp, Rn, Rt, fs, fsA, ls, dotR, guia, wA, nombres, delta, kEdge, SPAN,
+                     modo: fijo ? 'fijo' : 'rueda', cx: W / 2, cy };
         }
 
         function construirArco() {
             geo = calcularGeo();
             const g = geo;
-
-            /* Altura del SVG y hueco hasta la pizza (para que nada la pise) */
-            const caidaPizza = dx => Math.abs(dx) >= g.pizzaR ? 1e9 : g.pizzaR - Math.sqrt(g.pizzaR * g.pizzaR - dx * dx);
-            const muestras = [];
-            PIZZAS.forEach((p, i) => {
-                if (g.modo === 'fijo') muestras.push({ i, k: kDe(i, 0) });
-                else for (let k = -g.kEdge; k <= g.kEdge + 0.001; k += 0.25) muestras.push({ i, k });
-            });
-            let pizzaTop = g.topY + g.dotR * 3;
-            let maxY = g.topY + g.dotR * 2;
-            muestras.forEach(({ i, k }) => {
-                const pt = punto(k);
-                const abajo = i % 2 === 1;
-                const bottom = abajo
-                    ? pt.y + g.dotR * 1.8 + g.dentro + g.lineas[i].length * g.lineH + 2
-                    : pt.y + g.dotR * 1.5;
-                maxY = Math.max(maxY, bottom);
-                if (abajo) pizzaTop = Math.max(pizzaTop, bottom + 8 - caidaPizza(pt.x - g.cx));
-            });
-            const kArco = g.modo === 'fijo' ? (N - 1) / 2 + 0.45 : g.kEdge + 0.9;
-            maxY = Math.max(maxY, punto(kArco).y + 2);
-            const H = Math.ceil(maxY + 4);
-            pizzaTop = Math.ceil(pizzaTop);
+            const thFin = g.modo === 'fijo' ? g.SPAN + g.delta * 0.45 : Math.min((g.kEdge + 0.8) * g.delta, 95 * GRAD);
+            const H = Math.ceil(g.cy + (g.modo === 'fijo' ? 30 : 4));
+            const pizzaTop = g.cy - g.Rp;                      // dónde empieza la escena dentro del SVG
 
             svg.setAttribute('viewBox', `0 0 ${g.W} ${H}`);
             svg.setAttribute('height', H);
@@ -1253,9 +1442,9 @@
             svg.style.setProperty('--fsA', g.fsA + 'px');
             arcWrap.style.marginBottom = -(H - pizzaTop) + 'px';
 
-            /* Línea del arco */
-            const p0 = punto(-kArco), p1 = punto(kArco);
-            arcPath.setAttribute('d', `M ${p0.x.toFixed(1)},${p0.y.toFixed(1)} A ${g.r},${g.r} 0 0 1 ${p1.x.toFixed(1)},${p1.y.toFixed(1)}`);
+            /* Línea de la aureola */
+            const p0 = enAureola(-thFin, g.Rn), p1 = enAureola(thFin, g.Rn);
+            arcPath.setAttribute('d', `M ${p0.x.toFixed(1)},${p0.y.toFixed(1)} A ${g.Rn},${g.Rn} 0 0 1 ${p1.x.toFixed(1)},${p1.y.toFixed(1)}`);
 
             /* Difuminado de los extremos en modo rueda */
             if (g.modo === 'rueda') {
@@ -1266,34 +1455,19 @@
                 arcRoot.removeAttribute('mask');
             }
 
-            /* Etiquetas */
+            /* Etiquetas: cada una va girada siguiendo la curva */
             labelsG.textContent = '';
+            const yTexto = -(g.dotR * 1.8 + g.guia + g.fsA * 0.22);
             items = PIZZAS.map((p, i) => {
-                const abajo = i % 2 === 1;
-                const lin = g.lineas[i];
-                const dir = abajo ? 1 : -1;
-                const y1 = dir * g.dotR * 1.8;
-                const y2 = dir * (g.dotR * 1.8 + (abajo ? g.dentro : g.fuera));
-                const bloque = lin.length * g.lineH;
-                const hw = Math.max(22, Math.max(...lin.map(l => anchoTexto(l, g.fsA, g.ls))) / 2 + 8);
-
+                const hw = Math.max(22, g.wA[i] / 2 + 8);
                 const grupo = svgEl('g', { class: 'arc-item', role: 'button', tabindex: '0', 'aria-label': p.nombre });
-                const yTop = abajo ? -g.dotR * 2 : y2 - bloque - 6;
-                const yBot = abajo ? y2 + bloque + 6 : g.dotR * 2;
-                const alto = Math.max(yBot - yTop, 44);
-                grupo.appendChild(svgEl('rect', { x: -hw, y: abajo ? yTop : yBot - alto, width: hw * 2, height: alto, fill: 'transparent' }));
-                grupo.appendChild(svgEl('line', { class: 'guia', x1: 0, y1, x2: 0, y2, 'stroke-width': 0.8, 'stroke-dasharray': '3 2' }));
+                const top = yTexto - g.fsA * 1.05 - 6;
+                grupo.appendChild(svgEl('rect', { x: -hw, y: top, width: hw * 2, height: Math.max(44, -top + g.dotR * 2), fill: 'transparent' }));
+                grupo.appendChild(svgEl('line', { class: 'guia', x1: 0, y1: -g.dotR * 1.8, x2: 0, y2: -(g.dotR * 1.8 + g.guia), 'stroke-width': 0.8, 'stroke-dasharray': '3 2' }));
                 grupo.appendChild(svgEl('circle', { class: 'nodo', cx: 0, cy: 0, r: g.dotR }));
-
-                const text = svgEl('text', { 'text-anchor': 'middle', 'font-family': FUENTE, 'letter-spacing': g.ls });
-                const primera = abajo ? y2 + g.fsA * 0.95 : y2 - g.fsA * 0.3 - (lin.length - 1) * g.lineH;
-                lin.forEach((linea, li) => {
-                    const ts = svgEl('tspan', { x: 0, y: (primera + li * g.lineH).toFixed(1) });
-                    ts.textContent = linea;
-                    text.appendChild(ts);
-                });
+                const text = svgEl('text', { 'text-anchor': 'middle', 'font-family': FUENTE, 'letter-spacing': g.ls, x: 0, y: yTexto.toFixed(1) });
+                text.textContent = g.nombres[i];
                 grupo.appendChild(text);
-
                 grupo.addEventListener('click', e => { e.stopPropagation(); irAPizza(i); });
                 grupo.addEventListener('keydown', e => {
                     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); irAPizza(i); }
@@ -1317,10 +1491,11 @@
         function pintarArco(ring, dot) {
             items.forEach((it, i) => {
                 const k = kDe(i, ring);
-                const pt = punto(k);
-                it.g.setAttribute('transform', `translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)})`);
+                const th = k * geo.delta;
+                const pt = enAureola(th, geo.Rn);
+                it.g.setAttribute('transform', `translate(${pt.x.toFixed(2)} ${pt.y.toFixed(2)}) rotate(${(th / GRAD).toFixed(2)})`);
                 if (geo.modo === 'rueda') {
-                    const op = clamp((geo.kEdge + 0.25 - Math.abs(k)) / 1.1, 0, 1);
+                    const op = clamp((geo.kEdge + 0.4 - Math.abs(k)) / 0.9, 0, 1);
                     it.g.style.opacity = op.toFixed(3);
                     const vis = op > 0.3;
                     if (vis !== it.visible) {
@@ -1335,7 +1510,7 @@
                     it.g.setAttribute('tabindex', '0');
                 }
             });
-            const pd = punto(geo.modo === 'fijo' ? dot - (N - 1) / 2 : 0);
+            const pd = enAureola(geo.modo === 'fijo' ? (dot - (N - 1) / 2) * geo.delta : 0, geo.Rn);
             arcDot.setAttribute('cx', pd.x.toFixed(2));
             arcDot.setAttribute('cy', pd.y.toFixed(2));
         }
@@ -1523,11 +1698,12 @@
                 const n = clamp(Math.round(r.estrellas || 5), 0, 5);
                 const est = '★'.repeat(n) + `<span class="vacia">${'★'.repeat(5 - n)}</span>`;
                 const meta = [r.fuente, r.fecha].filter(Boolean).map(esc).join(' · ');
+                const pz = r.pizza && PIZZAS.find(p => p.id === r.pizza);
                 return `
                 <article class="resena">
                     <div class="resena-top">
                         <span class="estrellas" aria-label="${n} de 5 estrellas">${est}</span>
-                        ${r.ejemplo ? '<span class="tag-ejemplo">Ejemplo</span>' : ''}
+                        ${pz ? `<a class="resena-pizza" href="#${esc(pz.id)}" data-pizza="${esc(pz.id)}">${esc(pz.nombre)} ›</a>` : ''}
                     </div>
                     <p class="resena-texto">${esc(r.texto)}</p>
                     <div class="resena-autor">
@@ -1536,6 +1712,23 @@
                     </div>
                 </article>`;
             }).join('');
+
+            /* Botón de pizza en la reseña: sube a la carta y gira hasta esa pizza */
+            pista.querySelectorAll('.resena-pizza').forEach(a => a.addEventListener('click', e => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+                setTimeout(() => { location.hash = a.dataset.pizza; }, reduceMotion ? 0 : 450);
+            }));
+
+            /* Nota media de Google */
+            if (CONFIG.notaGoogle) {
+                $('notaNum').textContent = CONFIG.notaGoogle.toFixed(1).replace('.', ',');
+                $('notaRelleno').style.width = (CONFIG.notaGoogle / 5 * 100) + '%';
+                $('notaTxt').textContent = CONFIG.opinionesGoogle ? `${CONFIG.opinionesGoogle} opiniones en Google` : 'en Google';
+                $('notaGoogle').setAttribute('aria-label', `${CONFIG.notaGoogle} de 5 en Google, ${CONFIG.opinionesGoogle} opiniones. Ver en Google Maps`);
+            } else {
+                $('notaGoogle').style.display = 'none';
+            }
 
             const cards = [...pista.children];
             puntos.innerHTML = cards.map((_, i) => `<button aria-label="Ver reseña ${i + 1}"></button>`).join('');
@@ -1613,7 +1806,8 @@
         ══════════════════════════════════════════════ */
         (function contacto() {
             const llamar = $('btnLlamar'), wa = $('btnWhatsapp'), fab = $('fabPedir');
-            const tel = CONFIG.telefono.replace(/[^\d+]/g, '');
+            let tel = CONFIG.telefono.replace(/[^\d+]/g, '');
+            if (tel && !tel.startsWith('+')) tel = '+34' + tel;
             if (tel) {
                 llamar.href = 'tel:' + tel;
                 $('txtLlamar').textContent = 'Llamar · ' + CONFIG.telefono;
@@ -1625,13 +1819,67 @@
             } else {
                 wa.style.display = 'none';
             }
-            const dir = $('datoDireccion'), hor = $('datoHorario');
-            if (CONFIG.direccion) dir.querySelector('span').textContent = CONFIG.direccion; else dir.style.display = 'none';
-            if (CONFIG.horario)   hor.querySelector('span').textContent = CONFIG.horario;   else hor.style.display = 'none';
+            /* Enlaces de Google Maps */
+            const pid = CONFIG.googlePlaceId;
+            const urlFicha = pid ? `https://www.google.com/maps/place/?q=place_id:${pid}`
+                                 : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Pizzería Torre del Oro Sevilla');
+            const urlRuta  = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent('Pizzería Torre del Oro, ' + CONFIG.direccion) +
+                             (pid ? '&destination_place_id=' + pid : '');
+            const urlResena = pid ? `https://search.google.com/local/writereview?placeid=${pid}` : urlFicha;
+            $('notaGoogle').href = urlFicha;
+            $('btnVerTodas').href = urlFicha;
+            $('btnResena').href = urlResena;
+            $('btnRuta').href = urlRuta;
+            $('pieDireccion').href = urlRuta;
 
-            const btnRes = $('btnResena');
-            btnRes.href = CONFIG.urlResena ||
-                'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Pizzería Torre del Oro');
+            $('datoDireccion').textContent = CONFIG.direccion;
+            const ig = $('btnInstagram');
+            if (CONFIG.instagram) ig.href = `https://www.instagram.com/${CONFIG.instagram}/`; else ig.style.display = 'none';
+
+            /* Horario + "Abierto ahora" (siempre con la hora de Sevilla) */
+            const DIAS = [['domingo', 'Domingo'], ['lunes', 'Lunes'], ['martes', 'Martes'], ['miercoles', 'Miércoles'],
+                          ['jueves', 'Jueves'], ['viernes', 'Viernes'], ['sabado', 'Sábado']];
+            const aMin = h => { const [a, b] = h.split(':').map(Number); return a * 60 + b; };
+            const hora = h => h === '24:00' ? '00:00' : h;
+            function ahoraSevilla() {
+                try {
+                    const f = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+                    const parts = Object.fromEntries(f.formatToParts(new Date()).map(x => [x.type, x.value]));
+                    const dia = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts.weekday);
+                    return { dia, min: Number(parts.hour) * 60 + Number(parts.minute) };
+                } catch (e) {
+                    const d = new Date(); return { dia: d.getDay(), min: d.getHours() * 60 + d.getMinutes() };
+                }
+            }
+
+            function pintarHorario() {
+                const { dia, min } = ahoraSevilla();
+                const orden = [1, 2, 3, 4, 5, 6, 0];   // de lunes a domingo
+                $('tablaHorario').innerHTML = orden.map(d => {
+                    const h = HORARIO[DIAS[d][0]];
+                    const cls = [d === dia ? 'hoy' : '', h ? '' : 'cerrado-dia'].join(' ').trim();
+                    return `<tr class="${cls}"><td>${DIAS[d][1]}</td><td>${h ? `${hora(h[0])} – ${hora(h[1])}` : 'Cerrado'}</td></tr>`;
+                }).join('');
+
+                const est = $('estado');
+                const hoy = HORARIO[DIAS[dia][0]];
+                if (hoy && min >= aMin(hoy[0]) && min < aMin(hoy[1])) {
+                    est.className = 'estado abierto';
+                    const fin = hoy[1] === '24:00' ? 'hasta medianoche' : `hasta las ${hoy[1]}`;
+                    est.innerHTML = `<span class="punto"></span><span><b>Abierto ahora</b> · ${fin}</span>`;
+                } else {
+                    let txt = '';
+                    if (hoy && min < aMin(hoy[0])) txt = `abre hoy a las ${hoy[0]}`;
+                    else for (let k = 1; k <= 7; k++) {
+                        const d = (dia + k) % 7, h = HORARIO[DIAS[d][0]];
+                        if (h) { txt = `abre ${k === 1 ? 'mañana' : 'el ' + DIAS[d][1].toLowerCase()} a las ${h[0]}`; break; }
+                    }
+                    est.className = 'estado cerrado';
+                    est.innerHTML = `<span class="punto"></span><span><b>Cerrado</b>${txt ? ' · ' + txt : ''}</span>`;
+                }
+            }
+            pintarHorario();
+            setInterval(pintarHorario, 60000);
 
             $('anio').textContent = new Date().getFullYear();
 
