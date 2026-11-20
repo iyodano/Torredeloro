@@ -21,7 +21,7 @@
             "addressCountry": "ES"
         },
         "geo": { "@type": "GeoCoordinates", "latitude": 37.382136, "longitude": -5.9949132 },
-        "hasMap": "https://www.google.com/maps/place/?q=place_id:ChIJXYbqyJJtEg0RcgO9WeKWAvs",
+        "hasMap": "https://maps.app.goo.gl/ojHAyYercUCoGK139",
         "sameAs": ["https://www.instagram.com/pizzeria_torredeloro/"],
         "openingHoursSpecification": [
             { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Tuesday", "Sunday"], "opens": "12:00", "closes": "17:00" },
@@ -1396,6 +1396,7 @@
             instagram:  'pizzeria_torredeloro',
             /* Ficha de Google Maps (identificador de la pizzería en Google) */
             googlePlaceId: 'ChIJXYbqyJJtEg0RcgO9WeKWAvs',
+            urlGoogleMaps: 'https://maps.app.goo.gl/ojHAyYercUCoGK139',   // enlace "Compartir" de la ficha (abre bien la app en el móvil)
             notaGoogle: 4.9,                        // nota media en Google (actualízala de vez en cuando)
             opinionesGoogle: 576,                   // nº de opiniones en Google
             precioExtra: 0.60,                      // ingrediente extra (0 o null para ocultar la nota)
@@ -2297,8 +2298,11 @@
             }
             /* Enlaces de Google Maps */
             const pid = CONFIG.googlePlaceId;
-            const urlFicha = pid ? `https://www.google.com/maps/place/?q=place_id:${pid}`
-                                 : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Pizzería Torre del Oro Sevilla');
+            /* Ficha de Google: el enlace de compartir de la propia app; si no hay, el formato oficial de Google
+               (con el nombre por si la app no reconoce el identificador). Ojo: "place_id:…" no funciona en la app del iPhone */
+            const urlFicha = CONFIG.urlGoogleMaps ||
+                ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Pizzería Torre del Oro, Sevilla') +
+                 (pid ? '&query_place_id=' + pid : ''));
             const urlRuta  = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent('Pizzería Torre del Oro, ' + CONFIG.direccion) +
                              (pid ? '&destination_place_id=' + pid : '');
             const urlResena = pid ? `https://search.google.com/local/writereview?placeid=${pid}` : urlFicha;
