@@ -25,6 +25,9 @@
         "@context": "https://schema.org",
         "@type": "Restaurant",
         "name": "Pizzería Torre del Oro",
+        "legalName": "Pizzeria Torre del Oro S.L.",
+        "taxID": "B72548530",
+        "email": "pizzeriatorredeloro@gmail.com",
         "servesCuisine": "Pizza",
         "priceRange": "€",
         "telephone": "+34 613 85 10 59",
@@ -45,7 +48,7 @@
         ]
     }
     </script>
-    <title>Pizzería Torre del Oro</title>
+    <title>Pizzería Torre del Oro · Pizzas en Sevilla, junto a la Torre del Oro</title>
     <link rel="preload" as="image" href="img/margherita.webp" imagesrcset="img/margherita-900.webp 900w, img/margherita.webp 1200w" imagesizes="(max-width: 700px) 300px, 600px" fetchpriority="high">
     <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
@@ -894,7 +897,7 @@
             line-height: 1.15;
         }
         .seccion-sub {
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.68);
             font-size: clamp(0.88rem, 3.4vw, 1rem);
             margin-top: 8px;
             line-height: 1.5;
@@ -1119,8 +1122,13 @@
         .btn-oro:hover { background: #ffc552; }
         .btn-borde { border: 1px solid rgba(243,179,61,0.55); color: var(--oro); }
         .btn-borde:hover { background: rgba(243,179,61,0.12); }
-        .btn-verde { background: #25d366; color: #0b2614; }
-        .btn-verde:hover { background: #3be07a; }
+        /* Llamar: el mismo verde que el botón flotante */
+        .btn-llamar {
+            background: linear-gradient(160deg, #42e07c, #1fae4f);
+            color: #04230f;
+            box-shadow: 0 8px 22px rgba(31,174,79,0.4), inset 0 1px 0 rgba(255,255,255,0.35);
+        }
+        .btn-llamar:hover { background: linear-gradient(160deg, #55e88b, #23bd57); }
 
         /* ── Contacto ── */
         .contacto {
@@ -1143,6 +1151,7 @@
             margin: 0 auto 30px;
             fill: var(--oro);
         }
+        .nota-alergias { margin-top: 2px; font-size: clamp(0.82rem, 3.2vw, 0.9rem); }
         .contacto-botones {
             display: flex;
             gap: 12px;
@@ -1257,6 +1266,50 @@
         footer a { color: rgba(255,255,255,0.78); text-decoration: none; display: inline-block; padding: 14px 4px; margin: -14px -4px; }
         @media (max-width: 700px) { footer b { display: block; margin-bottom: 6px; } .pie-sep { display: none; } }
         footer a:hover { color: var(--oro); }
+        .pie-legal { margin-top: 8px; font-size: 0.76rem; color: rgba(255,255,255,0.55); }
+        .pie-legal a { color: rgba(255,255,255,0.68); }
+        .pie-legal a:hover { color: var(--oro); }
+
+        /* ── Aviso legal ── */
+        .aviso {
+            width: min(92vw, 600px);
+            max-height: min(86vh, 760px);
+            margin: auto;
+            padding: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            background: #2f3034;
+            color: rgba(255,255,255,0.82);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        .aviso::backdrop { background: rgba(10,10,12,0.66); }
+        html:has(.aviso[open]) { overflow: hidden; }
+        .aviso-contenido {
+            max-height: min(86vh, 760px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding: 28px 26px 26px;
+            text-align: left;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .aviso h2 { font-family: var(--marca); font-weight: 600; font-size: 1.6rem; color: #fff; margin: 0 40px 10px 0; letter-spacing: 0.01em; }
+        .aviso h3 { font-family: var(--marca); font-weight: 500; font-size: 0.8rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--oro); margin: 22px 0 6px; }
+        .aviso p { margin: 0 0 8px; }
+        .aviso dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 14px 0 4px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
+        .aviso dt { color: rgba(255,255,255,0.6); }
+        .aviso dd { margin: 0; color: #fff; overflow-wrap: anywhere; }
+        .aviso a { color: var(--oro); }
+        .aviso-cerrar {
+            position: absolute; top: 12px; right: 12px; z-index: 1;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.25); color: #fff;
+            display: grid; place-items: center; cursor: pointer;
+        }
+        .aviso-cerrar svg { width: 18px; height: 18px; }
+        .aviso-cerrar:hover { background: var(--oro); color: #111; border-color: transparent; }
+        @media (max-width: 500px) { .aviso dl { grid-template-columns: 1fr; gap: 0; } .aviso dd { margin-bottom: 8px; } }
 
         /* ── Botón flotante de llamar: siempre a la vista (móvil y PC), menos cuando se ve el "Llamar" de contacto ── */
         .fab-pedir {
@@ -1533,17 +1586,14 @@
             </svg>
             <div class="sobretitulo" data-t="encargaRecoge">Encarga y recoge</div>
             <h2 class="seccion-titulo" data-t="recienSalida">Recién salida del horno</h2>
-            <p class="seccion-sub" data-t="llamanos">Llámanos o escríbenos y te la preparamos.</p>
+            <p class="seccion-sub" data-t="llamanos">Llámanos y te la preparamos para recoger.</p>
+            <p class="seccion-sub nota-alergias" data-t="alergias">¿Alergias o intolerancias? Dínoslo al llamar.</p>
             <p class="estado" id="estado" aria-live="polite"></p>
 
             <div class="contacto-botones">
-                <a class="btn btn-oro" id="btnLlamar">
+                <a class="btn btn-llamar" id="btnLlamar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
                     <span id="txtLlamar">Llamar</span>
-                </a>
-                <a class="btn btn-verde" id="btnWhatsapp" target="_blank" rel="noopener">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
-                    WhatsApp
                 </a>
             </div>
 
@@ -1567,7 +1617,16 @@
 
     <footer>
         <b>PIZZERÍA TORRE DEL ORO</b><span class="pie-sep"> · </span><a id="pieDireccion" target="_blank" rel="noopener" data-t="pieDireccion">C. Almirante Lobo, 2 · Sevilla</a> · © <span id="anio">2026</span>
+        <p class="pie-legal"><a href="#aviso-legal" id="lnkAviso" data-t="avisoLegal">Aviso legal</a><span class="pie-punto"> · </span><span id="pieCredito"></span></p>
     </footer>
+
+    <!-- Aviso legal (se abre desde el pie o con #aviso-legal en la dirección) -->
+    <dialog class="aviso" id="avisoLegal" aria-labelledby="avisoTitulo">
+        <button class="aviso-cerrar" type="button" id="avisoCerrar" aria-label="Cerrar" data-t-aria="cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <div class="aviso-contenido" id="avisoContenido"></div>
+    </dialog>
 
     <a class="btn fab-pedir" id="fabPedir" href="#contacto">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
@@ -1584,7 +1643,6 @@
         ══════════════════════════════════════════════ */
         const CONFIG = {
             telefono:   '613 85 10 59',
-            whatsapp:   '34613851059',              // número con prefijo, sin + ni espacios ('' para ocultar el botón)
             direccion:  'C. Almirante Lobo, 2 · 41001 Sevilla',   // (el texto en inglés está en TEXTOS)
             instagram:  'pizzeria_torredeloro',
             /* Ficha de Google Maps (identificador de la pizzería en Google) */
@@ -1593,6 +1651,16 @@
             notaGoogle: 4.9,                        // nota media en Google (actualízala de vez en cuando)
             opinionesGoogle: 576,                   // nº de opiniones en Google
             precioExtra: 0.60,                      // ingrediente extra (0 o null para ocultar la nota)
+            /* Aviso legal (artículo 10 de la LSSI) */
+            legal: {
+                titular:   'Pizzeria Torre del Oro S.L.',
+                nif:       'B72548530',
+                domicilio: 'C. Almirante Lobo, 2 · 41001 Sevilla',   // domicilio social de la S.L. (si es otro, cambiarlo aquí)
+                email:     'pizzeriatorredeloro@gmail.com',
+                registro:  '',   // p. ej. 'Registro Mercantil de Sevilla, tomo 0000, folio 00, hoja SE-000000' ('' = no se muestra)
+            },
+            /* Firma del pie: con url, el nombre es un enlace */
+            credito: { nombre: 'Dan Roca', url: '' },
         };
 
         /* Horario (hora de Sevilla). null = cerrado. '24:00' = medianoche */
@@ -1683,9 +1751,28 @@
                 cabAbierto: 'Abierto', cabCerrado: 'Cerrado', cabHasta: h => `hasta ${h}`,
                 cabAbreHoy: h => `abre hoy ${h}`, cabAbreManana: 'abre mañana', cabAbreDia: dia => `abre el ${dia.toLowerCase()}`,
                 cabVerHorario: 'ver horario',
-                llamanos: 'Llámanos o escríbenos y te la preparamos para recoger.',
+                avisoLegal: 'Aviso legal', cerrar: 'Cerrar', hechaPor: 'Web hecha por',
+                avisoTexto: L => `
+                    <h2 id="avisoTitulo">Aviso legal</h2>
+                    <p>En cumplimiento del artículo 10 de la Ley 34/2002, de servicios de la sociedad de la información y de comercio electrónico (LSSI-CE), estos son los datos del titular de esta web:</p>
+                    <dl>
+                        <dt>Titular</dt><dd>${L.titular}</dd>
+                        <dt>NIF</dt><dd>${L.nif}</dd>
+                        <dt>Domicilio</dt><dd>${L.domicilio}</dd>
+                        <dt>Correo electrónico</dt><dd><a href="mailto:${L.email}">${L.email}</a></dd>
+                        <dt>Teléfono</dt><dd><a href="tel:${L.tel}">${L.telTxt}</a></dd>
+                        ${L.registro ? `<dt>Datos registrales</dt><dd>${L.registro}</dd>` : ''}
+                    </dl>
+                    <h3>Uso de la web</h3>
+                    <p>Esta web informa de la carta, los precios, el horario y la forma de contacto de la pizzería. A través de ella no se vende nada: los pedidos se hacen por teléfono y se recogen en el local. La carta y los precios pueden cambiar; ante cualquier duda, pregúntanos al llamar.</p>
+                    <h3>Datos personales y cookies</h3>
+                    <p>Esta web no tiene formularios ni estadísticas y no usa cookies. Solo guarda en tu navegador el idioma que eliges y si ya has usado la carta, y esa información no sale de tu dispositivo.</p>
+                    <h3>Propiedad intelectual</h3>
+                    <p>El logotipo, las fotos y los textos de esta web pertenecen a ${L.titular}. Las opiniones son reseñas públicas de clientes en Google.</p>`,
+                llamanos: 'Llámanos y te la preparamos para recoger.',
+                alergias: '¿Alergias o intolerancias? Dínoslo al llamar.',
                 llamar: tel => `Llamar · ${tel}`,
-                mensajeWhatsapp: '¡Hola! Quería hacer un pedido para recoger 🍕',
+
                 dondeEstamos: 'Dónde estamos', aUnPaso: 'A un paso de la Torre del Oro',
                 direccion: 'C. Almirante Lobo, 2 · 41001 Sevilla', pieDireccion: 'C. Almirante Lobo, 2 · Sevilla',
                 comoLlegar: 'Cómo llegar', horario: 'Horario', hoy: 'hoy', cerrado: 'Cerrado',
@@ -1720,9 +1807,29 @@
                 cabAbierto: 'Open', cabCerrado: 'Closed', cabHasta: h => `until ${h}`,
                 cabAbreHoy: h => `opens ${h}`, cabAbreManana: 'opens tomorrow', cabAbreDia: dia => `opens ${dia}`,
                 cabVerHorario: 'see opening hours',
-                llamanos: 'Call or message us and we’ll have it ready for you to collect.',
+                avisoLegal: 'Legal notice', cerrar: 'Close', hechaPor: 'Website by',
+                avisoTexto: L => `
+                    <h2 id="avisoTitulo">Legal notice</h2>
+                    <p>In accordance with article 10 of Spanish Law 34/2002 on information society services and electronic commerce (LSSI-CE), these are the details of the owner of this website:</p>
+                    <dl>
+                        <dt>Owner</dt><dd>${L.titular}</dd>
+                        <dt>Tax ID (NIF)</dt><dd>${L.nif}</dd>
+                        <dt>Address</dt><dd>${L.domicilio}</dd>
+                        <dt>Email</dt><dd><a href="mailto:${L.email}">${L.email}</a></dd>
+                        <dt>Phone</dt><dd><a href="tel:${L.tel}">${L.telTxt}</a></dd>
+                        ${L.registro ? `<dt>Registration</dt><dd>${L.registro}</dd>` : ''}
+                    </dl>
+                    <h3>Use of this website</h3>
+                    <p>This website shows the pizzeria’s menu, prices, opening hours and contact details. Nothing is sold through it: orders are placed by phone and collected at the restaurant. The menu and prices may change; if in doubt, just ask us when you call.</p>
+                    <h3>Personal data and cookies</h3>
+                    <p>This website has no forms or analytics and uses no cookies. It only stores in your browser the language you choose and whether you have already used the menu, and that information never leaves your device.</p>
+                    <h3>Intellectual property</h3>
+                    <p>The logo, photos and texts on this website belong to ${L.titular}. The reviews are public customer reviews on Google.</p>
+                    <p><small>This is a translation; the Spanish version prevails.</small></p>`,
+                llamanos: 'Call us and we’ll have it ready for you to collect.',
+                alergias: 'Any allergies or intolerances? Just tell us when you call.',
                 llamar: tel => `Call · +34 ${tel}`,
-                mensajeWhatsapp: 'Hi! I’d like to place an order for collection 🍕',
+
                 dondeEstamos: 'Find us', aUnPaso: 'Just steps from the Torre del Oro',
                 direccion: 'C. Almirante Lobo, 2 · 41001 Seville', pieDireccion: 'C. Almirante Lobo, 2 · Seville',
                 comoLlegar: 'Directions', horario: 'Opening hours', hoy: 'today', cerrado: 'Closed',
@@ -2556,14 +2663,12 @@
            CONTACTO
         ══════════════════════════════════════════════ */
         (function contacto() {
-            const llamar = $('btnLlamar'), wa = $('btnWhatsapp'), fab = $('fabPedir');
+            const llamar = $('btnLlamar'), fab = $('fabPedir');
             let tel = CONFIG.telefono.replace(/[^\d+]/g, '');
             if (tel && !tel.startsWith('+')) tel = '+34' + tel;
             if (tel) llamar.href = 'tel:' + tel; else llamar.style.display = 'none';
-            if (!CONFIG.whatsapp) wa.style.display = 'none';
             function textosContacto() {
                 if (tel) $('txtLlamar').textContent = t('llamar')(CONFIG.telefono);
-                if (CONFIG.whatsapp) wa.href = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(t('mensajeWhatsapp'))}`;
                 $('datoDireccion').textContent = t('direccion');
                 if (CONFIG.precioExtra) {
                     const precio = idioma === 'en' ? `+€${fmt(CONFIG.precioExtra)}` : `+${fmt(CONFIG.precioExtra)} €`;
@@ -2660,6 +2765,49 @@
             alCambiarIdioma.push(pintarHorario, textosContacto);
 
             $('anio').textContent = new Date().getFullYear();
+
+            /* Pie: firma y aviso legal */
+            const credito = CONFIG.credito;
+            function pintarPie() {
+                const c = $('pieCredito');
+                if (!credito || !credito.nombre) { c.textContent = ''; return; }
+                const nombre = credito.url
+                    ? `<a href="${esc(credito.url)}" target="_blank" rel="noopener">${esc(credito.nombre)}</a>`
+                    : esc(credito.nombre);
+                c.innerHTML = `${esc(t('hechaPor'))} ${nombre}`;
+            }
+            const aviso = $('avisoLegal');
+            function pintarAviso() {
+                const L = CONFIG.legal || {};
+                $('avisoContenido').innerHTML = t('avisoTexto')({
+                    titular: esc(L.titular || ''), nif: esc(L.nif || ''), domicilio: esc(idioma === 'en' ? t('direccion') : (L.domicilio || '')),
+                    email: esc(L.email || ''), registro: esc(L.registro || ''),
+                    tel: tel, telTxt: esc(idioma === 'en' ? '+34 ' + CONFIG.telefono : CONFIG.telefono),
+                });
+            }
+            function abrirAviso() {
+                if (aviso.open) return;
+                pintarAviso();
+                if (aviso.showModal) aviso.showModal(); else aviso.setAttribute('open', '');
+                $('avisoContenido').scrollTop = 0;
+            }
+            function cerrarAviso() {
+                if (aviso.close) aviso.close(); else aviso.removeAttribute('open');
+            }
+            aviso.addEventListener('close', () => {
+                if (location.hash === '#aviso-legal') { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }
+            });
+            $('lnkAviso').addEventListener('click', e => {
+                e.preventDefault();
+                try { history.replaceState(null, '', '#aviso-legal'); } catch (err) {}
+                abrirAviso();
+            });
+            $('avisoCerrar').addEventListener('click', cerrarAviso);
+            aviso.addEventListener('click', e => { if (e.target === aviso) cerrarAviso(); });   // toque fuera de la caja
+            window.addEventListener('hashchange', () => { if (location.hash === '#aviso-legal') abrirAviso(); });
+            if (location.hash === '#aviso-legal') abrirAviso();
+            pintarPie();
+            alCambiarIdioma.push(pintarPie, () => { if (aviso.open) pintarAviso(); });
 
 
             /* Botón flotante de llamar: siempre a la vista, salvo mientras se ve el botón
