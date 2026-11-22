@@ -31,7 +31,7 @@
     }
     </script>
     <title>Pizzería Torre del Oro</title>
-    <link rel="preload" as="image" href="img/margherita.webp">
+    <link rel="preload" as="image" href="img/margherita.webp" imagesrcset="img/margherita-900.webp 900w, img/margherita.webp 1200w" imagesizes="(max-width: 700px) 300px, 600px" fetchpriority="high">
     <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
@@ -162,6 +162,41 @@
 
         .menu-derecha { display: flex; align-items: center; gap: 30px; }
 
+        /* ── Abierto / cerrado en la cabecera (toca → horario) ── */
+        .estado-cab {
+            margin: 0 26px 0 auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 13px;
+            border-radius: 50px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            color: rgba(255,255,255,0.78);
+            font-size: 0.82rem;
+            line-height: 1.2;
+            text-decoration: none;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+            transition: background .25s ease, border-color .25s ease;
+        }
+        .estado-cab:empty { display: none; }
+        .estado-cab:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.16); }
+        .estado-cab .punto { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: #9a9a9a; }
+        .estado-cab b { font-weight: 700; }
+        .estado-cab .ec-det::before { content: '·'; margin: 0 6px; opacity: .6; }
+        .estado-cab.abierto .punto { background: #4cd47b; box-shadow: 0 0 0 3px rgba(76,212,123,0.18); }
+        .estado-cab.abierto b { color: #4cd47b; }
+        .estado-cab.cerrado .punto { background: #ff8a7a; box-shadow: 0 0 0 3px rgba(255,138,122,0.16); }
+        .estado-cab.cerrado b { color: #ff8a7a; }
+        /* Pantallas medianas: solo "● Abierto" para que quepa el menú */
+        @media (min-width: 701px) and (max-width: 1060px) {
+            .estado-cab { margin-right: 18px; padding: 6px 11px; }
+            .estado-cab .ec-det { display: none; }
+            .menu-derecha { gap: 22px; }
+            .top-menu nav { gap: 22px; }
+        }
+
         /* ── Selector de idioma (banderas) ── */
         .idiomas {
             display: flex;
@@ -189,6 +224,10 @@
             transition: background .25s ease, color .25s ease;
         }
         .idioma:hover { color: #fff; }
+        .idioma { position: relative; }
+        .idioma::after { content: ''; position: absolute; top: -10px; bottom: -10px; left: 0; right: 0; }
+        .idioma:first-child::after { left: -6px; }
+        .idioma:last-child::after { right: -8px; }
         .idioma[aria-pressed="true"] {
             background: rgba(243,179,61,0.16);
             color: var(--oro);
@@ -228,7 +267,37 @@
             .logo-icono { height: 34px; width: calc(34px * 907 / 504); }
             .logo-pizzeria { font-size: 9px; letter-spacing: 0.5em; }
             .logo-marca { height: 21px; width: calc(21px * 1257 / 301); }
+            /* En el móvil, a la izquierda (el hueco libre), en dos líneas */
+            .estado-cab {
+                position: absolute;
+                left: 6px;
+                top: 50%;
+                transform: translateY(-50%);
+                margin: 0;
+                min-height: 44px;
+                padding: 4px 6px;
+                gap: 6px;
+                background: none;
+                border: 0;
+                font-size: 11.5px;
+            }
+            .estado-cab:hover { background: none; }
+            /* "● Abierto" arriba y el detalle debajo, empezando en el borde (así cabe junto al logo) */
+            .estado-cab {
+                display: grid;
+                grid-template-columns: auto 1fr;
+                column-gap: 5px;
+                row-gap: 1px;
+                align-items: center;
+                align-content: center;
+            }
+            .estado-cab .ec-linea { display: contents; }
+            .estado-cab .ec-det { grid-column: 1 / -1; font-size: 10.5px; color: rgba(255,255,255,0.7); }
+            .estado-cab .ec-det::before { display: none; }
         }
+        @media (max-width: 380px) { .estado-cab .ec-det { font-size: 10px; } }
+        /* Móviles muy estrechos: no cabe junto al logo */
+        @media (max-width: 345px) { .estado-cab { display: none; } }
 
         /* ── Hero ── */
         .hero {
@@ -246,7 +315,7 @@
         }
         @media (max-width: 700px) { .hero { padding: 20px 0 14px; } }
         /* Móviles estrechos: el logo se aparta un poco para dejar sitio a las banderas */
-        @media (max-width: 380px) { .logo { margin-right: 66px; } }
+        @media (max-width: 345px) { .logo { margin-right: 66px; } }
 
         /* ── Arco selector (rueda) ── */
         .arc-selector-wrap {
@@ -346,6 +415,7 @@
         }
 
         .pizza-wrapper img.active { opacity: 1; }
+        .pizza-wrapper img:not([src]) { visibility: hidden; }
         /* Sombra de la pizza: un círculo fijo (más barato que una sombra por foto) */
         .pizza-wrapper::before {
             content: '';
@@ -382,6 +452,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         .flecha svg { width: 45%; height: 45%; }
+        .flecha::before { content: ''; position: absolute; inset: -7px; border-radius: 50%; }   /* zona de toque de 48 px */
         .flecha-izq { left: max(4px, calc(var(--ancho-total) * 0.03)); }
         .flecha-der { right: max(4px, calc(var(--ancho-total) * 0.03)); }
         .flecha:hover,
@@ -394,10 +465,6 @@
         }
         .flecha:active { transform: translateY(-50%) scale(0.92); }
 
-        @keyframes pulsoIzq { 0%,100% { transform: translate(0,-50%); } 50% { transform: translate(-5px,-50%); } }
-        @keyframes pulsoDer { 0%,100% { transform: translate(0,-50%); } 50% { transform: translate(5px,-50%); } }
-        .pizza-scene.pista .flecha-izq { animation: pulsoIzq 1.1s ease-in-out 3; opacity: .95; }
-        .pizza-scene.pista .flecha-der { animation: pulsoDer 1.1s ease-in-out 3; opacity: .95; }
 
         .capa-negra-intermedia {
             position: absolute;
@@ -480,14 +547,37 @@
             .precio-card { padding: 7px 12px 8px; }
         }
 
+        /* Rótulo de la carta: deja claro que la rueda es la carta */
+        .carta-rotulo {
+            position: relative;
+            z-index: 22;
+            margin: 0 0 12px;
+            font-size: 0.78rem;
+            line-height: 1;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .carta-rotulo::before, .carta-rotulo::after {
+            content: '';
+            width: 26px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(243,179,61,0.6));
+        }
+        .carta-rotulo::after { transform: scaleX(-1); }
+        @media (max-width: 700px) { .carta-rotulo { font-size: 0.72rem; margin-bottom: 10px; } }
+        @media (max-height: 620px) and (max-width: 700px) { .carta-rotulo { margin-bottom: 6px; } }
+
         .contador-pizza {
             position: relative;
             z-index: 20;
             margin-top: calc(var(--ancho-total) * -0.075);
             font-family: var(--marca);
             font-size: clamp(0.85rem, 3.6vw, 1rem);
-            letter-spacing: 0.22em;
-            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.7);
             font-variant-numeric: tabular-nums;
         }
         .contador-pizza b { color: var(--oro); font-weight: 600; }
@@ -521,8 +611,8 @@
 
         .nota-extra {
             margin-top: 8px;
-            font-size: clamp(0.72rem, 3vw, 0.82rem);
-            color: rgba(255,255,255,0.42);
+            font-size: clamp(0.78rem, 3.2vw, 0.86rem);
+            color: rgba(255,255,255,0.68);
             letter-spacing: 0.02em;
         }
         .nota-extra b { color: var(--oro); font-weight: 600; }
@@ -560,14 +650,13 @@
             transform: translateX(-130%);
             will-change: transform;
             background: linear-gradient(100deg, transparent, rgba(255,255,255,0.13), transparent);
-            animation: brillo 3.8s ease-in-out infinite;
             pointer-events: none;
         }
         @keyframes brillo { 0%, 62% { transform: translateX(-130%); } 100% { transform: translateX(290%); } }
         .btn-ruleta:hover { box-shadow: 0 12px 34px rgba(243,179,61,0.22); }
         .btn-ruleta:active { transform: scale(0.98); }
         .btn-ruleta:disabled { cursor: progress; }
-        .btn-ruleta.girando::after { animation-duration: .9s; }
+        .btn-ruleta.girando::after { animation: brillo .9s ease-in-out infinite; }
         .btn-ruleta.premio {
             box-shadow: 0 0 0 3px rgba(243,179,61,0.35), 0 12px 40px rgba(243,179,61,0.35);
         }
@@ -666,10 +755,10 @@
 
         .precio-label {
             font-family: var(--marca);
-            font-size: clamp(0.68rem, 2vw, 0.8rem);
-            letter-spacing: 0.16em;
+            font-size: clamp(0.75rem, 2vw, 0.82rem);
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
+            color: rgba(255,255,255,0.64);
             font-weight: 600;
         }
 
@@ -876,8 +965,10 @@
             border-radius: 20px;
             margin-right: 34px;
             white-space: nowrap;
+            position: relative;
             transition: background .25s ease;
         }
+        .resena-pizza::after { content: ''; position: absolute; inset: -8px -4px; }
         .resena-pizza:hover { background: rgba(243,179,61,0.12); }
 
         .resena-texto {
@@ -925,7 +1016,7 @@
             white-space: nowrap;
             color: var(--oro);
         }
-        .nota-txt { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+        .nota-txt { font-size: 0.8rem; color: rgba(255,255,255,0.72); }
         .g-logo { width: 14px; height: 14px; vertical-align: -2px; margin-left: 2px; }
 
         .resena-autor { display: flex; align-items: center; gap: 12px; }
@@ -939,7 +1030,7 @@
             flex-shrink: 0;
         }
         .resena-autor strong { display: block; font-size: 0.92rem; }
-        .resena-autor small { color: rgba(255,255,255,0.42); font-size: 0.76rem; }
+        .resena-autor small { color: rgba(255,255,255,0.66); font-size: 0.78rem; }
 
         .carrusel-control {
             display: flex;
@@ -966,18 +1057,28 @@
         .carrusel-puntos {
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 0;
         }
+        /* El botón mide 28×32 para el dedo; el puntito se dibuja dentro */
         .carrusel-puntos button {
-            width: 8px; height: 8px;
-            border-radius: 8px;
+            width: 20px; height: 32px;
             border: 0;
-            background: rgba(255,255,255,0.22);
+            background: none;
             cursor: pointer;
             padding: 0;
+            display: grid;
+            place-items: center;
+            transition: width .3s ease;
+        }
+        .carrusel-puntos button::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.3);
             transition: width .3s ease, background .3s ease;
         }
-        .carrusel-puntos button.activo { width: 24px; background: var(--oro); }
+        .carrusel-puntos button.activo { width: 36px; }
+        .carrusel-puntos button.activo::before { width: 24px; background: var(--oro); }
 
         .resenas-cta { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 26px; padding: 0 16px; }
 
@@ -1018,6 +1119,7 @@
             margin: 0 auto;
             text-align: center;
         }
+        @media (min-width: 701px) { .contacto-caja { width: min(92vw, 760px); } }
         .logo-completo {
             display: block;
             width: clamp(170px, 44vw, 240px);
@@ -1082,6 +1184,7 @@
         }
         @media (max-width: 640px) { .ficha { grid-template-columns: 1fr; } }
         .ficha-bloque {
+            scroll-margin-top: calc(var(--alto-header) + 16px);
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 18px;
@@ -1101,16 +1204,16 @@
         }
         .ficha-titulo svg { width: 16px; height: 16px; }
         .ficha-texto { color: rgba(255,255,255,0.82); line-height: 1.55; font-size: 0.95rem; }
-        .ficha-texto small { display: block; color: rgba(255,255,255,0.45); font-size: 0.82rem; margin-top: 4px; }
+        .ficha-texto small { display: block; color: rgba(255,255,255,0.66); font-size: 0.84rem; margin-top: 4px; }
         .ficha-enlaces { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-        .btn-mini { padding: 9px 16px; font-size: 0.9rem; }
+        .btn-mini { padding: 9px 16px; font-size: 0.9rem; min-height: 44px; }
         .btn-mini svg { width: 16px; height: 16px; }
 
         .horario { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
         .horario td { padding: 6px 0; color: rgba(255,255,255,0.72); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .horario tr:last-child td { border-bottom: 0; }
-        .horario td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-        .horario .cerrado-dia td:last-child { color: rgba(255,255,255,0.35); }
+        .horario td:last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; padding-left: 12px; }
+        .horario .cerrado-dia td:last-child { color: rgba(255,255,255,0.6); }
         .horario .hoy td { color: #fff; font-weight: 700; }
         .horario .hoy td:first-child::after {
             content: attr(data-hoy);
@@ -1130,13 +1233,13 @@
         footer {
             background: #26272b;
             border-top: 1px solid rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.35);
+            color: rgba(255,255,255,0.62);
             text-align: center;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
         }
         footer b { color: var(--oro); font-family: var(--marca); font-weight: 500; letter-spacing: 0.12em; }
-        footer a { color: rgba(255,255,255,0.55); text-decoration: none; }
+        footer a { color: rgba(255,255,255,0.78); text-decoration: none; display: inline-block; padding: 14px 4px; margin: -14px -4px; }
         @media (max-width: 700px) { footer b { display: block; margin-bottom: 6px; } .pie-sep { display: none; } }
         footer a:hover { color: var(--oro); }
 
@@ -1167,7 +1270,7 @@
            el de llamar se queda en un círculo para no taparlo; al bajar se despliega con el texto */
         .fab-pedir.compacto { padding: 0 16.5px; }   /* 19 px de icono + 33 = círculo de 52 */
         .fab-pedir.compacto .fab-texto { max-width: 0; margin-left: 0; opacity: 0; }
-        .fab-pedir.compacto.visible::after { animation-name: onda-circulo; }
+        .fab-pedir.compacto.visible::after { animation-name: onda-circulo, onda-circulo-lenta; }
         @keyframes onda-circulo {
             0%        { transform: scale(1);   opacity: 0.75; }
             60%, 100% { transform: scale(1.5); opacity: 0; }
@@ -1198,8 +1301,22 @@
             opacity: 0;
             pointer-events: none;
         }
-        .fab-pedir.visible::after { animation: onda 2.6s ease-out infinite; }
-        .fab-pedir.visible svg { animation: suena 2.6s ease-in-out infinite; }
+        /* Al aparecer: 3 ondas seguidas; luego, una cada 11 s (antes, cada 2,6 s sin parar) */
+        .fab-pedir.visible::after { animation: onda 2.6s ease-out 3, onda-lenta 11s ease-out 7.8s infinite; }
+        .fab-pedir.visible svg { animation: suena 2.6s ease-in-out 3, suena-lenta 11s ease-in-out 7.8s infinite; }
+        @keyframes onda-lenta {
+            0%        { transform: scale(1);         opacity: 0.75; }
+            14%, 100% { transform: scale(1.3, 1.7);  opacity: 0; }
+        }
+        @keyframes onda-circulo-lenta {
+            0%        { transform: scale(1);   opacity: 0.75; }
+            14%, 100% { transform: scale(1.5); opacity: 0; }
+        }
+        @keyframes suena-lenta {
+            0%, 5%, 100% { transform: rotate(0); }
+            1% { transform: rotate(-16deg); } 2% { transform: rotate(14deg); }
+            3% { transform: rotate(-12deg); } 4% { transform: rotate(10deg); }
+        }
         @keyframes onda {
             0%        { transform: scale(1);         opacity: 0.75; }
             60%, 100% { transform: scale(1.3, 1.7);  opacity: 0; }
@@ -1216,7 +1333,6 @@
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
             .carrusel-pista { scroll-behavior: auto; }
-            .pizza-scene.pista .flecha { animation: none; }
             .btn-ruleta::after, .btn-ruleta.girando .dado svg, .estado.abierto .punto::after,
             .fab-pedir.visible::after, .fab-pedir.compacto.visible::after, .fab-pedir.visible svg { animation: none; }
         }
@@ -1246,6 +1362,7 @@
                 <svg class="logo-marca" aria-hidden="true"><use href="#lg-marca"/></svg>
             </span>
         </a>
+        <a class="estado-cab" id="estadoCab" href="#horario"></a>
         <div class="menu-derecha">
             <nav>
                 <a href="#carta" data-t="menuCarta">Carta</a>
@@ -1265,6 +1382,8 @@
 
     <main>
     <section class="hero" id="carta">
+
+        <h1 class="sobretitulo carta-rotulo" data-t="nuestraCarta">Nuestra carta</h1>
 
         <div class="arc-selector-wrap" id="arcWrap">
             <svg id="arc-svg" xmlns="http://www.w3.org/2000/svg" aria-label="Elige pizza" data-t-aria="ariaElige">
@@ -1310,7 +1429,7 @@
             </div>
         </div>
 
-        <p class="contador-pizza" id="contador" aria-live="polite"><b>1</b> / 12</p>
+        <p class="contador-pizza" id="contador" aria-live="polite">Pizza <b>1</b> de 12</p>
 
         <p class="instrucciones" data-t-html="instrucciones">
             <b>‹</b> Toca un lado <span class="solo-ancho">de la pizza </span>para cambiar <b>›</b>
@@ -1397,7 +1516,7 @@
             <svg class="logo-completo" viewBox="15 55 1265 1125" role="img" aria-label="Pizzería Torre del Oro · Pizza 34 cm">
                 <use href="#lg-letras-p"/><use href="#lg-pizza-p"/><use href="#lg-marca-p"/><use href="#lg-eslogan-p"/>
             </svg>
-            <div class="sobretitulo" data-t="teApetece">¿Te apetece?</div>
+            <div class="sobretitulo" data-t="encargaRecoge">Encarga y recoge</div>
             <h2 class="seccion-titulo" data-t="recienSalida">Recién salida del horno</h2>
             <p class="seccion-sub" data-t="llamanos">Llámanos o escríbenos y te la preparamos.</p>
             <p class="estado" id="estado" aria-live="polite"></p>
@@ -1422,7 +1541,7 @@
                         <a class="btn btn-borde btn-mini" id="btnInstagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg> Instagram</a>
                     </div>
                 </div>
-                <div class="ficha-bloque">
+                <div class="ficha-bloque" id="horario">
                     <div class="ficha-titulo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> <span data-t="horario">Horario</span></div>
                     <table class="horario" id="tablaHorario"></table>
                 </div>
@@ -1544,7 +1663,11 @@
                 ariaNota: (nota, n) => `${nota} de 5 en Google, ${n} opiniones. Ver en Google Maps`,
                 traducida: '',
                 verTodas: 'Ver todas en Google', dejaResena: 'Déjanos tu reseña',
-                teApetece: '¿Te apetece?', recienSalida: 'Recién salida del horno',
+                encargaRecoge: 'Encarga y recoge', recienSalida: 'Recién salida del horno',
+                nuestraCarta: 'Nuestra carta', contador: (n, total) => `Pizza <b>${n}</b> de ${total}`,
+                cabAbierto: 'Abierto', cabCerrado: 'Cerrado', cabHasta: h => `hasta ${h}`,
+                cabAbreHoy: h => `abre hoy ${h}`, cabAbreManana: 'abre mañana', cabAbreDia: dia => `abre el ${dia.toLowerCase()}`,
+                cabVerHorario: 'ver horario',
                 llamanos: 'Llámanos o escríbenos y te la preparamos para recoger.',
                 llamar: tel => `Llamar · ${tel}`,
                 mensajeWhatsapp: '¡Hola! Quería hacer un pedido para recoger 🍕',
@@ -1577,7 +1700,11 @@
                 ariaNota: (nota, n) => `Rated ${nota} out of 5 on Google from ${n} reviews. See on Google Maps`,
                 traducida: 'Translated from Spanish',
                 verTodas: 'See all on Google', dejaResena: 'Leave us a review',
-                teApetece: 'Hungry?', recienSalida: 'Fresh out of the oven',
+                encargaRecoge: 'Order & collect', recienSalida: 'Fresh out of the oven',
+                nuestraCarta: 'Our menu', contador: (n, total) => `Pizza <b>${n}</b> of ${total}`,
+                cabAbierto: 'Open', cabCerrado: 'Closed', cabHasta: h => `until ${h}`,
+                cabAbreHoy: h => `opens ${h}`, cabAbreManana: 'opens tomorrow', cabAbreDia: dia => `opens ${dia}`,
+                cabVerHorario: 'see opening hours',
                 llamanos: 'Call or message us and we’ll have it ready for you to collect.',
                 llamar: tel => `Call · +34 ${tel}`,
                 mensajeWhatsapp: 'Hi! I’d like to place an order for collection 🍕',
@@ -1665,19 +1792,47 @@
             return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
         }
 
+        /* Las fotos no se descargan todas al entrar: primero la que se ve y su vecina;
+           las demás cuando el cliente empieza a mirar la carta (o en segundo plano con buena conexión).
+           Cada foto tiene dos tamaños: 900 px (móviles y PC normales) y 1200 px (pantallas grandes nítidas). */
         const container = $('pizzaContainer');
         const pizzas = PIZZAS.map((p, i) => {
             const img = document.createElement('img');
-            img.src = p.img || placeholderSVG(p.nombre);
             img.alt = p.nombre;
             img.draggable = false;
             img.decoding = 'async';
-            if (i === 0) img.fetchPriority = 'high';
-            img.onerror = () => { img.onerror = null; img.src = placeholderSVG(p.nombre); };
+            img.onerror = () => {
+                if (img.srcset) { img.removeAttribute('srcset'); img.removeAttribute('sizes'); return; }   // si falta la de 900, usa la grande
+                img.onerror = null; img.src = placeholderSVG(p.nombre);
+            };
             if (p.id === 'calzone') img.classList.add('con-forma');
             container.appendChild(img);
             return img;
         });
+        const version900 = src => src.replace(/\.webp$/, '-900.webp');
+        function cargar(i, urgente) {
+            i = ((i % N) + N) % N;
+            const img = pizzas[i], p = PIZZAS[i];
+            if (img.dataset.cargada) return;
+            img.dataset.cargada = '1';
+            if (urgente) img.fetchPriority = 'high';
+            if (!p.img) { img.src = placeholderSVG(p.nombre); return; }
+            if (/\.webp$/.test(p.img)) {
+                /* "sizes" pide 900 px en móvil (300 px × 3) y en PC normal; 1200 px solo en pantallas retina grandes */
+                img.sizes = '(max-width: 700px) 300px, 600px';
+                img.srcset = `${version900(p.img)} 900w, ${p.img} 1200w`;
+            }
+            img.src = p.img;
+        }
+        let todasPedidas = false;
+        function cargarTodas() {
+            if (todasPedidas) return;
+            todasPedidas = true;
+            /* de la más cercana a la más lejana */
+            [...Array(N).keys()]
+                .sort((a, b) => Math.min((a - currentIndex + N) % N, (currentIndex - a + N) % N) - Math.min((b - currentIndex + N) % N, (currentIndex - b + N) % N))
+                .forEach(i => cargar(i));
+        }
 
         /* ══════════════════════════════════════════════
            PRECIOS E INGREDIENTES
@@ -1729,7 +1884,7 @@
 
             ingEl.innerHTML = p.ingredientes.map(x => `<span class="ing">${esc(tIng(x))}</span>`).join('');
             reanimar(ingEl, 'cambiando');
-            contador.innerHTML = `<b>${idx + 1}</b> / ${N}`;
+            contador.innerHTML = t('contador')(idx + 1, N);
         }
 
         /* ══════════════════════════════════════════════
@@ -1925,10 +2080,12 @@
         const DURACION = 800;
         const SWAP_EN  = 0.5;
 
-        function irAPizza(targetIndex, direccion) {
+        function irAPizza(targetIndex, direccion, demo) {
             if (animating) return;
             if (targetIndex === currentIndex) return;
             animating = true;
+            cargar(targetIndex, true);
+            if (!demo) cargarTodas();
 
             const adelante = ((targetIndex - currentIndex) + N) % N;
             let pasos;
@@ -1953,7 +2110,7 @@
                 marcarActivo(currentIndex);
                 actualizarInfo(currentIndex);
                 precargarVecinas(currentIndex);
-                try { history.replaceState(null, '', '#' + PIZZAS[currentIndex].id); } catch (e) {}
+                if (!demo) { try { history.replaceState(null, '', '#' + PIZZAS[currentIndex].id); } catch (e) {} }
             }, dur * SWAP_EN);
 
             setTimeout(() => {
@@ -2025,6 +2182,8 @@
             if (animating || girandoRuleta) return;
             let destino;
             do { destino = Math.floor(Math.random() * N); } while (destino === currentIndex && N > 1);
+            cargar(destino, true);
+            cargarTodas();
 
             /* Que se vea la pizza mientras gira */
             const top = scene.getBoundingClientRect().top;
@@ -2076,7 +2235,7 @@
                     pizzas[mostrado].classList.remove('active');
                     pizzas[idx].classList.add('active');
                     marcarActivo(idx);
-                    contador.innerHTML = `<b>${idx + 1}</b> / ${N}`;
+                    contador.innerHTML = t('contador')(idx + 1, N);
                     mostrado = idx;
                     if (navigator.vibrate) { try { navigator.vibrate(5); } catch (err) {} }
                 }
@@ -2108,17 +2267,21 @@
         btnRuleta.addEventListener('click', ruleta);
         btnRuleta.addEventListener('pointerdown', () => {
             if (girandoRuleta) return;
-            pizzas.forEach(im => { if (im.decode) im.decode().catch(() => {}); });
+            cargarTodas();
+            pizzas.forEach(im => { if (im.src && im.decode) im.decode().catch(() => {}); });
         }, { passive: true });
         pintarRuleta();
         alCambiarIdioma.push(pintarRuleta);
 
         function precargarVecinas(i) {
+            [i - 1, i + 1, i - 2, i + 2].forEach(j => cargar(j));
             [i - 1, i + 1].forEach(j => {
                 const img = pizzas[(j + N) % N];
-                if (img.decode) img.decode().catch(() => {});
+                if (img.src && img.decode) img.decode().catch(() => {});
             });
         }
+        /* En cuanto alguien toca la carta, se descarga el resto */
+        $('carta').addEventListener('pointerdown', cargarTodas, { passive: true, once: true });
 
         /* Toque en la pizza: mitad izquierda = anterior, derecha = siguiente.
            También vale deslizar el dedo. */
@@ -2168,6 +2331,8 @@
         (function init() {
             const desdeHash = PIZZAS.findIndex(p => '#' + p.id === decodeURIComponent(location.hash));
             if (desdeHash > 0) { currentIndex = ringPos = dotPos = desdeHash; }
+            cargar(currentIndex, true);
+            cargar(currentIndex + 1);
             pizzas[currentIndex].classList.add('active');
             container.style.transition = 'none';
             container.style.transform = 'rotate(0deg)';
@@ -2196,16 +2361,40 @@
                 }, 80);
             });
 
+            /* Si el cliente toca, desliza o pulsa una tecla, ya no hace falta la demostración */
+            let tocado = false;
+            ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(ev =>
+                window.addEventListener(ev, () => { tocado = true; }, { passive: true, capture: true, once: true }));
+
             window.addEventListener('load', () => {
-                pizzas.forEach(img => img.decode && img.decode().catch(() => {}));
-                /* Pequeña pista animada de las flechas, solo la primera visita */
+                /* Las de alrededor, un poco después (lo justo para pasar de una en una) */
+                setTimeout(() => precargarVecinas(currentIndex), 2500);
+                /* Con buena conexión (cuando el navegador lo dice), el resto de la carta en segundo plano */
+                const con = navigator.connection;
+                if (con && con.effectiveType === '4g' && !con.saveData) setTimeout(cargarTodas, 5000);
+
+                /* Primera visita: la rueda pasa sola a la siguiente pizza y vuelve,
+                   con la flecha de cada lado encendida. Así se ve que es la carta y cómo se cambia. */
                 let visto = false;
-                try { visto = localStorage.getItem('tdo-pista') === '1'; } catch (e) {}
-                if (!visto && !reduceMotion) {
-                    setTimeout(() => scene.classList.add('pista'), 900);
-                    setTimeout(() => scene.classList.remove('pista'), 4500);
-                    try { localStorage.setItem('tdo-pista', '1'); } catch (e) {}
-                }
+                try { visto = localStorage.getItem('tdo-demo') === '1'; } catch (e) {}
+                if (visto || reduceMotion || desdeHash >= 0) return;
+                setTimeout(async () => {
+                    if (tocado || document.hidden || animating || window.scrollY > 120) return;
+                    const ini = currentIndex, sig = (ini + 1) % N;
+                    cargar(sig);
+                    try { await pizzas[sig].decode(); } catch (e) {}
+                    if (tocado || animating) return;
+                    try { localStorage.setItem('tdo-demo', '1'); } catch (e) {}
+                    scene.classList.add('lado-der');
+                    irAPizza(sig, 1, true);
+                    setTimeout(() => {
+                        scene.classList.remove('lado-der');
+                        if (tocado || animating || currentIndex !== sig) return;
+                        scene.classList.add('lado-izq');
+                        irAPizza(ini, -1, true);
+                        setTimeout(() => scene.classList.remove('lado-izq'), DURACION);
+                    }, DURACION + 1300);
+                }, 1500);
             });
         })();
 
@@ -2416,6 +2605,28 @@
                     est.className = 'estado cerrado';
                     est.innerHTML = `<span class="punto"></span><span><b>${t('cerrado')}</b>${txt ? ' · ' + txt : ''}</span>`;
                 }
+                pintarEstadoCabecera(dia, min, nombres);
+            }
+
+            /* Versión corta para la cabecera: "● Abierto · hasta 17:00" / "● Cerrado · abre mañana" */
+            function pintarEstadoCabecera(dia, min, nombres) {
+                const cab = $('estadoCab');
+                const hoy = HORARIO[DIAS[dia]];
+                let abierto = false, det = '';
+                if (hoy && min >= aMin(hoy[0]) && min < aMin(hoy[1])) {
+                    abierto = true; det = t('cabHasta')(hora(hoy[1]));
+                } else if (hoy && min < aMin(hoy[0])) {
+                    det = t('cabAbreHoy')(hoy[0]);
+                } else {
+                    for (let k = 1; k <= 7; k++) {
+                        const d = (dia + k) % 7, h = HORARIO[DIAS[d]];
+                        if (h) { det = k === 1 ? t('cabAbreManana') : t('cabAbreDia')(nombres[d]); break; }
+                    }
+                }
+                const estado = abierto ? t('cabAbierto') : t('cabCerrado');
+                cab.className = 'estado-cab ' + (abierto ? 'abierto' : 'cerrado');
+                cab.innerHTML = `<span class="punto" aria-hidden="true"></span><span class="ec-linea"><b>${estado}</b>${det ? `<span class="ec-det">${det}</span>` : ''}</span>`;
+                cab.setAttribute('aria-label', `${estado}${det ? ', ' + det : ''} · ${t('cabVerHorario')}`);
             }
             pintarHorario();
             textosContacto();
