@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#2c2d31">
     <meta name="description" content="Pizzería Torre del Oro, en C. Almirante Lobo 2, Sevilla, junto a la Torre del Oro. Pizzas enteras o por porción, para llevar o en la terraza. Tel. 613 85 10 59.">
+    <!-- Vista previa al compartir el enlace (WhatsApp, Telegram, Facebook, X…).
+         Las direcciones tienen que ser completas: si la web cambia de dominio, cambiar og:url y og:image. -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Pizzería Torre del Oro">
+    <meta property="og:title" content="Pizzería Torre del Oro · Sevilla">
+    <meta property="og:description" content="Pizzas de 34 cm, enteras o por porción, junto a la Torre del Oro. Encarga y recoge: 613 85 10 59.">
+    <meta property="og:url" content="https://iyodano.github.io/Torredeloro/">
+    <meta property="og:image" content="https://iyodano.github.io/Torredeloro/img/compartir.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Pizza Torre del Oro con la Torre del Oro de Sevilla y el logo de la pizzería">
+    <meta property="og:locale" content="es_ES">
+    <meta property="og:locale:alternate" content="en_GB">
+    <meta name="twitter:card" content="summary_large_image">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -2080,12 +2095,21 @@
         const DURACION = 800;
         const SWAP_EN  = 0.5;
 
+        /* Cuando el cliente cambia de pizza por su cuenta, ya sabe usar la carta: no más demostraciones */
+        let cartaUsada = false;
+        try { cartaUsada = localStorage.getItem('tdo-carta-usada') === '1'; } catch (e) {}
+        function marcarCartaUsada() {
+            if (cartaUsada) return;
+            cartaUsada = true;
+            try { localStorage.setItem('tdo-carta-usada', '1'); } catch (e) {}
+        }
+
         function irAPizza(targetIndex, direccion, demo) {
             if (animating) return;
             if (targetIndex === currentIndex) return;
             animating = true;
             cargar(targetIndex, true);
-            if (!demo) cargarTodas();
+            if (!demo) { cargarTodas(); marcarCartaUsada(); }
 
             const adelante = ((targetIndex - currentIndex) + N) % N;
             let pasos;
@@ -2184,6 +2208,7 @@
             do { destino = Math.floor(Math.random() * N); } while (destino === currentIndex && N > 1);
             cargar(destino, true);
             cargarTodas();
+            marcarCartaUsada();
 
             /* Que se vea la pizza mientras gira */
             const top = scene.getBoundingClientRect().top;
@@ -2361,10 +2386,12 @@
                 }, 80);
             });
 
-            /* Si el cliente toca, desliza o pulsa una tecla, ya no hace falta la demostración */
+            /* Si el cliente ya está tocando la carta o usando las flechas del teclado, no hace falta la demostración */
             let tocado = false;
-            ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(ev =>
-                window.addEventListener(ev, () => { tocado = true; }, { passive: true, capture: true, once: true }));
+            const yaToca = () => { tocado = true; };
+            $('carta').addEventListener('pointerdown', yaToca, { passive: true, capture: true });
+            $('carta').addEventListener('touchstart', yaToca, { passive: true, capture: true });
+            document.addEventListener('keydown', e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') yaToca(); });
 
             window.addEventListener('load', () => {
                 /* Las de alrededor, un poco después (lo justo para pasar de una en una) */
@@ -2373,18 +2400,17 @@
                 const con = navigator.connection;
                 if (con && con.effectiveType === '4g' && !con.saveData) setTimeout(cargarTodas, 5000);
 
-                /* Primera visita: la rueda pasa sola a la siguiente pizza y vuelve,
-                   con la flecha de cada lado encendida. Así se ve que es la carta y cómo se cambia. */
-                let visto = false;
-                try { visto = localStorage.getItem('tdo-demo') === '1'; } catch (e) {}
-                if (visto || reduceMotion || desdeHash >= 0) return;
+                /* Demostración: la rueda pasa sola a la siguiente pizza y vuelve, con la flecha de cada
+                   lado encendida, para que se vea que es la carta y cómo se cambia. Sale en cada visita
+                   hasta que el cliente cambia de pizza por su cuenta (o siempre, con ?demo en la dirección). */
+                const forzada = /[?&]demo\b/.test(location.search);
+                if (reduceMotion || (cartaUsada && !forzada)) return;
                 setTimeout(async () => {
                     if (tocado || document.hidden || animating || window.scrollY > 120) return;
                     const ini = currentIndex, sig = (ini + 1) % N;
                     cargar(sig);
                     try { await pizzas[sig].decode(); } catch (e) {}
-                    if (tocado || animating) return;
-                    try { localStorage.setItem('tdo-demo', '1'); } catch (e) {}
+                    if (tocado || animating || window.scrollY > 120) return;
                     scene.classList.add('lado-der');
                     irAPizza(sig, 1, true);
                     setTimeout(() => {
